@@ -1,0 +1,12 @@
+{
+  "watch": ["src/web"],
+  "ignore": [
+    "src/web/_next/**/*",
+    "src/web/.next/**/*",
+    "src/web/node_modules/**/*",
+    "src/static-files/web/**/*",
+    "src/web/build/**/*"
+  ],
+  "ext": "*",
+  "exec": "npm run build:web:local"
+}

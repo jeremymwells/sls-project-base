@@ -1,0 +1,77 @@
+.welcoming-container {
+  width: 100vw;
+  height: 100vh;
+}
+
+.welcoming-component-container {
+  padding: 10% 0 0 0;
+  text-align: center;
+
+  h1, h3 {
+    margin: 0 0 0 0;
+  }
+
+  div {
+    margin: 0 auto;
+  }
+}
+
+.welcoming-welcome {
+  margin: 3em !important;
+}
+
+.welcoming-selector-container {
+  width: 40%;
+  background-color: white;
+  padding: 1em 1em 1em 1em;
+  border: 1px solid gray;
+  border-radius: 4px;
+  max-height: 40%;
+}
+
+.welcoming-selector-container-wide {
+  width: 70%;
+  background-color: white;
+  padding: 1em 1em 1em 1em;
+  border: 1px solid gray;
+  border-radius: 4px;
+  max-height: 50%;
+  h3 {
+    height: 2.5em;
+  }
+}
+
+.welcoming-selector-button-container {
+  padding: 1em 1em 0 1em;
+  text-align: right;
+}
+
+.cadence-panels {
+  text-align: center;
+}
+
+.welcoming-cadence-right {
+  vertical-align: top;
+  padding-left: 2em
+}
+
+.welcoming-cadence-left, .welcoming-cadence-right {
+  width: 45%;
+  display: inline-block;
+}
+
+.radio-group {
+  padding: .5em 0 .5em 0;
+}
+
+.radio-container {
+  display: inline-block;
+  padding-left: 2em;
+  div {
+    text-align: center;
+  }
+}
+
+.kanban-weeks {
+  color: #499ddf;
+}

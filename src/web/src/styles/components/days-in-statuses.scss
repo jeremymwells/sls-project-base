@@ -1,0 +1,40 @@
+.days-in-statuses-header {
+  margin: 0 0 0 0;
+  padding: .75em 0 .75em 0;
+  text-align: center;
+  h4 {
+    font-size: 1.5em;
+    text-decoration: underline;
+    margin: inherit;
+    pre {
+      margin: inherit;
+    }
+  }
+}
+
+.days-in-statuses-column-group {
+  margin: 0 .5em 1.5em .5em;
+
+  .column {
+    text-align: left;
+    font-size: 1em;
+    border-bottom: 1px solid $blackChocolate;
+    width: 50%;
+  }
+
+  .days-in-statuses-status-row {
+    font-size: .75em;
+
+    .left { 
+      display: inline-block;
+      margin: 0 5px 0 1em;
+      text-align: right;
+    }
+    .right {
+      display: inline-block;
+      text-align: left;
+    }
+  }
+
+}
+

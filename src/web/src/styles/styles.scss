@@ -1,0 +1,45 @@
+@import './mixins';
+@import './variables';
+@import url($fontFaceUrl);
+@import '~primeicons/primeicons';
+@import '~primereact/resources/themes/saga-blue/theme.css';
+@import '~primereact/resources/primereact.min.css';
+@import '~primeicons/primeicons.css';
+@import '~react-loader-spinner/dist/loader/css/react-spinner-loader.css';
+@import '~primeflex/primeflex.css';
+
+body {
+  font-family: Montserrat;
+  // background-color: $pageBGColor;
+  color: $pageTextColor;
+  @include page-background;
+  // padding-bottom: 3.75em !important;
+}
+
+main {
+  margin-bottom: 4.5em;
+}
+
+.animus-button {
+  background: $buttonBGColor !important;
+  border: $buttonBGColor !important;
+  color: $buttonFGColor !important;
+}
+
+.p-component {
+  text-align: left;
+}
+
+
+@import './components/conditional-loader.scss';
+@import './components/graphing.scss';
+@import './components/welcoming.scss';
+@import './components/selector.scss';
+@import './components/fab-menu.scss';
+@import './components/animus-logo.scss';
+@import './components/additional-context.scss';
+@import './components/days-in-statuses.scss';
+@import './components/aggregate-stats.scss';
+@import './components/aggregate-report.scss';
+@import './components/dashboard.scss';
+

@@ -1,0 +1,133 @@
+
+.aggregate-report-container {
+  width: 100%;
+  // border-bottom: 1px solid $animusGreen;
+  height: calc(2.25em + 16px);
+  line-height: 2.25em;
+  position: relative;
+  text-align: center;
+}
+
+.field-header-container {
+  width: 100%;
+  overflow: auto;
+  white-space: nowrap;
+  line-height: 2em;
+  display: inline-block;
+  margin: 1em 0 .5em 0;
+}
+
+.aggregate-settings {
+  position: absolute;
+  top: 2px;
+  right: 10px;
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.field-header-tab {
+  display: inline-block;
+  width: auto;
+  margin: 3px 5px 0 5px;
+  padding: 8px 8px 8px 8px;
+  border-radius: 5px 5px 5px 5px;
+  border: 1px solid $animusGreen;
+  // border-radius: 5px 5px 0 0;
+  // border-right: 1px solid $animusGreen;
+  // border-top: 1px solid $animusGreen;
+  // border-left: 1px solid $animusGreen;
+  text-transform: capitalize;
+  &:hover {
+    cursor: pointer;
+    background-color: $animusGreenLight;
+    color: white;
+    opacity: .7;
+    border: 1px solid white;
+  }
+}
+
+.p-column-title {
+  text-transform: capitalize !important;
+}
+
+.inner-datatable {
+  margin: -.5rem -.5rem -.5rem -.5rem;
+  padding: .5rem 3rem .5rem 3rem;
+  // background-color: lighten($animusOrange, 40%);
+  .p-datatable-wrapper {
+    border: 1px solid #e9ecef;
+  }
+  .p-datatable-tbody {
+    background-color: white;
+  }
+}
+
+.active-field-header-tab {
+  background-color: $animusGreenLight;
+  color: white;
+  border: 1px solid white;
+}
+
+
+.issue-link {
+  color: $animusGreen;
+}
+
+.aggregate-loader {
+  width: 100vw;
+  height: 100vh;
+  padding: calc(100vh/2 - 200px) 0 0 calc(100vw/2 - 50px);
+  left: 0;
+  position: fixed;
+  div svg circle {
+    stroke: lighten($buttonBGColor, 25%) !important;
+  }
+  div svg circle:last-child {
+    fill: darken($buttonBGColor, 25%) !important;
+  }
+}
+
+.description-tooltip {
+  .p-tooltip-text {
+    width: 400px !important;
+  }
+}
+
+
+
+///////////old accordion shit from mytrix -->
+// .header, .footer {
+//   background-color: silver;
+//   color: #333333;
+//   padding: 1em;
+//   border-bottom: 1px solid gray;
+//   font-weight: 500;
+//   text-transform: capitalize;
+// }
+
+// .header div {
+//   &:hover {
+//       cursor: pointer;
+//   }
+// }
+
+// .stat-row {
+//   background-color: white;
+//   color: gray;
+//   padding: 1em;
+//   border-bottom: 1px solid gray;
+//   &:hover{
+//       cursor: pointer;
+//   }
+// }
+
+// .sort-icon {
+//   font-size: 1.25em;
+//   margin-top: .15em;
+//   position: absolute;
+// }
+
+// .sort-icon-hover {
+//   opacity: .6;
+// }

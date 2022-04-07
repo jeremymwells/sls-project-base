@@ -1,0 +1,47 @@
+.animus-logo {
+  position: fixed;
+  z-index: -1;
+  left: 1em;
+  bottom: 1em;
+  opacity: .125;
+  font-size: 1.5em;
+  text-decoration: none;
+  color: inherit;
+  
+  .animus-logo-text {
+    text-transform: uppercase;
+    display: inline;
+    line-height: 0em;
+
+    .a {
+      font-size: 1.25em;
+      font-stretch: ultra-condensed;
+      display: inline-block;
+      font-family: system-ui;
+      font-weight: 250;
+    }
+
+    .i {
+      text-transform: none;
+      display: inline-block;
+      transform: rotate(180deg) !important;
+      -webkit-transform: rotate(180deg) !important;
+      -moz-transform: rotate(180deg) !important;
+      -ms-transform: rotate(180deg) !important;
+      -o-transform: rotate(180deg) !important;
+      filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=2) !important;
+    }
+
+  }
+
+  img {
+    height: .75em;
+  }
+
+  &:hover {
+    transition: 0.3s;
+    cursor: pointer;
+    opacity: .75;
+    z-index: 5;
+  }
+}

@@ -1,0 +1,10 @@
+
+// header colors
+$headerBGColor:#f8f9fa;
+$headerBorderColor: darken($headerBGColor, 10%);
+$headerBorder: 1px solid $headerBorderColor;
+
+// header layout
+$headerHeight: 3em;
+$headerLineHeight: 3em;
+$headerPadding: .25em .25em .25em .25em;

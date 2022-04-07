@@ -1,0 +1,71 @@
+
+service: projectbase
+
+# You can pin your service to only deploy with a specific Serverless version
+# Check out our docs for more details
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  stage: ${opt:stage, 'local'}
+  region: ${opt:region, 'us-east-1'}
+  profile: projectbase-${self:provider.stage}
+  stackName: ${self:service}
+  environment:
+    STAGE: '${self:provider.stage}'
+    AWS_PROFILE: '${self:provider.profile}'
+  # iamRoleStatements:
+    # - ${file(./infra/web/s3-bucket.iam-role-statements.yml)}
+    # - Effect: Allow
+    #   Action:
+    #     - s3:PutObject
+    #   Resource: "arn:aws:s3:::web-${self:provider.stage}/*"
+  
+
+plugins:
+  - serverless-offline
+  - serverless-webpack
+  - fullstack-serverless
+
+custom:
+  region: ${self:provider.region}
+  webpack:
+    includeModules: true
+    forceExclude:
+      - aws-sdk
+  fullstack:
+    ${file(./infra/web/fullstack.yml)}
+
+functions:
+  ${file(./infra/api/lambda.function-defs.yml)}
+
+# resources: 
+#   Resources:
+#     WebsiteBucket:
+#       Type: AWS::S3::Bucket
+#       Properties:
+#         BucketName: 'web-${self:provider.stage}'
+#         WebsiteConfiguration:
+#           IndexDocument: index.html
+#           ErrorDocument: index.html
+#         BucketEncryption:
+#           ServerSideEncryptionConfiguration:
+#             - ServerSideEncryptionByDefault:
+#                 SSEAlgorithm: AES256
+#       DeletionPolicy: Delete
+#     BucketPolicy:
+#       Type: AWS::S3::BucketPolicy
+#       Properties:
+#         PolicyDocument:
+#           Version: "2012-10-17"
+#           Statement:
+#             - Effect: Allow
+#               Action: "s3:GetObject"
+#               Resource: !Sub arn:aws:s3:::${WebsiteBucket}/*
+#               Principal:
+#                 CanonicalUser: !GetAtt CloudFrontOriginAccessIdentity.S3CanonicalUserId
+#         Bucket: !Ref WebsiteBucket
+#   # - ${file(./infra/web/s3-bucket.resources.yml)}
+  
+

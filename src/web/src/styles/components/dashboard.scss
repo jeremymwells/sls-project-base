@@ -1,0 +1,188 @@
+.dash-card {
+  min-height: 350px;
+  position: relative;
+  &:hover {
+    .dash-card-wrapper {
+      .dashboard-card-header {
+        .dashboard-cta {
+          display: block;
+        }
+      }
+    }
+  }
+}
+
+.dash-card-background {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: $animusGreen;
+  opacity: .6;
+  border-radius: 3px 3px 3px 3px;
+}
+
+.dash-card-body {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  width: calc(100% - 20px);
+  height: calc(100% - 4rem);
+  background-color: white;
+  // opacity: .8;
+  border-radius: 3px 3px 3px 3px;
+  @include page-background;
+}
+
+.dash-card-wrapper {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+
+  .dashboard-card-header {
+    color: white;
+    font-size: 1.5rem;
+    line-height: 2.25em;
+    padding-left: 10px;
+    text-transform: capitalize;
+    .dashboard-cta {
+      display: none;
+      float: right;
+      margin: .5em .5em 0 0 !important;
+      background-color: $circleFill !important;
+      border-style: none !important;
+      color: #fff !important;
+      opacity: .9;
+      padding-left: 10px;
+      &:hover {
+        background-color: lighten($circleFill, 5%) !important;
+        opacity: 1;
+      }
+
+    }
+    
+  }
+
+  .dashboard-card-header-part {
+    text-align: center;
+    background-color: lighten(silver, 10%);
+    font-weight: 600;
+  }
+
+  .dashboard-card-content {
+    position: absolute;
+    left: 10px;
+    bottom: 10px;
+    width: calc(100% - 20px);
+    height: calc(100% - 4rem);
+    overflow-x: auto;
+  }
+
+  .dashboard-iteration-navigator {
+    position: absolute;
+    top: $containerMinHeight/2;
+    width: $containerMinWidth;
+    color: white;
+  
+    .last {
+      left: 1em;
+      position: inherit;
+      &:hover {
+        cursor: pointer;
+      }
+    }
+  
+    .next {
+      right: 1em;
+      position: inherit;
+      &:hover {
+        cursor: pointer;
+      }
+    }
+  
+  }
+}
+
+.dash-cycle-time-percentile,
+.dashboard-cycle-time-header {
+  .left {
+    display: inline-block;
+  }
+  .right {
+    display: inline-block;
+  }
+}
+
+.dashboard-card-header-sticker {
+  position: sticky;
+  top: 0;
+  width:100%;
+  left: 0;
+  margin-top: -2em;
+}
+
+.dashboard-card-subheader-part:nth-child(1) {
+  margin-top: 8px;
+}
+
+.dashboard-card-subheader-part {
+  font-size: .75em;
+  background-color: #fff;
+  border-top: 1px solid lighten(silver, 10%);
+  border-bottom: 1px solid lighten(silver, 10%);
+  margin: 0 0 5px 0;
+  line-height: .5em;
+  position: sticky;
+  top: calc(2em + 11px);
+  .p-col-6 {
+    text-align: left;
+    padding-left: 15px;
+    white-space: nowrap;
+  }
+  .p-col {
+    white-space: nowrap;
+    overflow: auto;
+    text-align: center;
+  }
+  .bump-right {
+    text-align: right;
+    padding-right: 15px;
+  }
+}
+
+.striped-dash-row {
+  width: 100%;
+  margin-left: 0;
+  .p-col-6,
+  .p-col {
+    text-align: center;
+  }
+  .p-col-3 {
+    margin: 0 30px 0 -30px;
+  }
+}
+
+.striped-dash-row.odd {
+  background-color: #f3f3f3;
+  border-top: 1px solid #dadada;
+  border-bottom: 1px solid #dadada;
+  line-height: .75em;
+}
+
+.striped-dash-row.even {
+  line-height: 2em;
+}
+
+.striped-dash-row.last {
+  height: 2.25em;
+}
+
+.dashboard-card-content-inner {
+  margin-top: 2em;
+}
+
+.sticky-bottom,
+.iteration-card-sticky-bottom {
+  position: sticky;
+  margin-left: .5em;
+  bottom: 1em;
+}

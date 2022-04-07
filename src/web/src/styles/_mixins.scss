@@ -1,0 +1,20 @@
+@mixin button {
+
+}
+
+@mixin page-background {
+  background-color: #f0f4fa;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='49' viewBox='0 0 28 49'%3E%3Cg fill-rule='evenodd'%3E%3Cg id='hexagons' fill='%234f517d' fill-opacity='0.025' fill-rule='nonzero'%3E%3Cpath d='M13.99 9.25l13 7.5v15l-13 7.5L1 31.75v-15l12.99-7.5zM3 17.9v12.7l10.99 6.34 11-6.35V17.9l-11-6.34L3 17.9zM0 15l12.98-7.5V0h-2v6.35L0 12.69v2.3zm0 18.5L12.98 41v8h-2v-6.85L0 35.81v-2.3zM15 0v7.5L27.99 15H28v-2.31h-.01L17 6.35V0h-2zm0 49v-8l12.99-7.5H28v2.31h-.01L17 42.15V49h-2z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+@mixin icon($iconWidth, $url) {
+  // data:image/svg+xml;base64,PHN2ZyBoZWlnaHQ9JzMwMHB4JyB3aWR0aD0nMzAwcHgnICBmaWxsPSIjMDAwMDAwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2ZXJzaW9uPSIxLjEiIHg9IjBweCIgeT0iMHB4IiB2aWV3Qm94PSIwIDAgMTAwIDEwMCIgZW5hYmxlLWJhY2tncm91bmQ9Im5ldyAwIDAgMTAwIDEwMCIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+PHBhdGggZD0iTTg3LjQsMTkuMWMtMC42LTMtMi40LTUuNC01LjYtN2MtNC4yLTIuMy04LjktMS42LTEzLjUsMmMtMywyLjMtNSw1LjItNS4zLDUuN0wzOC40LDUwLjlsLTAuNy0zLjdsLTMuNiw0LjVsLTIuMS00LjMgIGwtMi4yLDQuMmwtMy43LTQuMmwwLjIsNS42YzAuMSwzLjQsMC45LDUuNiwyLjMsNi4zYzAuOCwwLjQsMS44LDAuNiwzLjEsMC42aDBjMS42LDAsNC41LTAuNCw2LjEtMS45YzAuMS0wLjEsMC4zLTAuMiwwLjQtMC40ICBMNjMsMjYuMWMxLjIsMS44LDMuMiw0LjIsNi40LDUuNmMxLjUsMC43LDMsMC45LDQuNSwwLjljMS42LDAsMy4xLTAuMyw0LjUtMC43TDUxLjMsNjYuN2wxLjYsMS4yYzIuNCwxLjgsMy44LDQuNywzLjgsNy43ICBjMCw1LjMtNC4zLDkuNy05LjcsOS43Yy0zLjcsMC03LjEtMi4xLTguNy01LjVsLTEuOC0zLjdsLTEuOCwzLjdjLTEuNiwzLjQtNSw1LjUtOC43LDUuNWMtNS4zLDAtOS43LTQuMy05LjctOS43ICBjMC0zLDEuNC01LjksMy44LTcuN2MwLjktMC43LDEuMS0xLjksMC40LTIuOHMtMS45LTEuMS0yLjgtMC40Yy0zLjQsMi42LTUuNCw2LjctNS40LDEwLjljMCw3LjUsNi4xLDEzLjcsMTMuNywxMy43ICBjNC4xLDAsNy45LTEuOCwxMC41LTQuOWMyLjYsMy4xLDYuMyw0LjksMTAuNSw0LjljNy41LDAsMTMuNy02LjEsMTMuNy0xMy43YzAtMy42LTEuNC03LTMuOS05LjZsMjUuNi0zMi44ICBDODIuNywzMyw4OC43LDI1LjcsODcuNCwxOS4xeiBNNzAuMiwyOS45Yy0zLjEtMS40LTUtMy45LTUuOS01LjVsMS44LTIuM2wwLjEtMC4xYzAuMS0wLjEsNi4xLTguOSwxMi40LTdsLTEuNCwxLjggIGMtMC4zLDAuNC0wLjMsMS4xLDAuMiwxLjRjMC4yLDAuMSwwLjQsMC4yLDAuNiwwLjJjMC4zLDAsMC42LTAuMSwwLjgtMC40bDEuNy0yLjJjMS43LDEsMi42LDIuMywyLjksMy45YzAuNiwzLTEuMiw2LjYtMi44LDkgIEM3OC4zLDMwLDc0LDMxLjYsNzAuMiwyOS45eiI+PC9wYXRoPjwvc3ZnPg==
+  &:before {
+    content: '';
+    background-image: url($url);
+    background-size: $iconWidth $iconWidth;
+    display: inline-block;
+    width: $iconWidth;
+    height: $iconWidth;
+  }
+}

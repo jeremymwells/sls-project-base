@@ -1,0 +1,15 @@
+# package directories
+node_modules
+jspm_packages
+
+# Serverless directories
+.serverless
+
+# Webpack directories
+.tsout
+.webpack
+.vscode
+
+.DS_Store
+
+src/web/build
