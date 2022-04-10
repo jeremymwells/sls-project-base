@@ -1,0 +1,23 @@
+
+.welcoming-container {
+  width: 100vw;
+  height: 100vh;
+  padding: 1em 2em 1em 2em;
+  min-height: 800px;
+  position: relative;
+}
+
+.inner-container {
+  background-color: white;
+  width: 60%;
+  margin-left: 20%;
+  border: 1px solid gray;
+  border-radius: 2px 2px 2px 2px;
+  min-height: 40%;
+  padding: 1em 2em 1em 2em;
+}
+
+.submit-row {
+  padding: 1em 0 1em 0;
+  text-align: right;
+}

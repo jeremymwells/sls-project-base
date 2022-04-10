@@ -1,0 +1,26 @@
+Resources:
+  WebAccessLogBucketRetained:
+    Type: AWS::S3::Bucket
+    Condition: IsPathToProd
+    DeletionPolicy: Retain
+    Properties:
+      BucketName: ${self:custom.webAccessLogName}
+      VersioningConfiguration:
+        Status: Enabled
+  WebAccessLogBucketEphemeral:
+    Type: AWS::S3::Bucket
+    Condition: IsEphemeral
+    DeletionPolicy: Delete
+    Properties:
+      BucketName: ${self:custom.webAccessLogName}
+      VersioningConfiguration:
+        Status: Enabled
+Conditions:
+  IsPathToProd:
+    Fn::Equals:
+      - ${self:custom.isEphemeral}
+      - false  
+  IsEphemeral:
+    Fn::Equals:
+      - ${self:custom.isEphemeral}
+      - true  

@@ -1,1 +1,3 @@
-console.log('main');
+const helpers = require('./config-helpers');
+
+console.log(helpers.getUsername())

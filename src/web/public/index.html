@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#000000" />
     <meta
-      name="Animus"
-      content="Animus for Jira"
+      name="GreenEZ"
+      content="GreenEZ"
     />
     
 
@@ -27,12 +27,11 @@
       work correctly both with client-side routing and a non-root public URL.
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
-    <title>ANIMUS for jira</title>
-    <script type="text/javascript" src="https://connect-cdn.atl-paas.net/all.js" async></script>
+    <title>GreenEZ</title>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
-    <!-- <base href="%PUBLIC_URL%">  -->
+    <base href="%PUBLIC_URL%">
     <div id="root"></div>
     <!--
       This HTML file is a template.
@@ -44,20 +43,5 @@
       To begin the development, run `npm start` or `yarn start`.
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
-    <script>
-      {
-        var WS = window.WebSocket;
-        function DevWebSocket(s) {
-          if (s === 'wss://animusbidev.tunnelto.dev/sockjs-node') {
-            console.info("[DEV NOTICE] Live Reload Has Been Disabled");
-            return {};
-          } else {
-            // Pass through other usage of sockets
-            return new WS(s);
-          }
-        }
-        window.WebSocket = DevWebSocket;
-      }
-    </script>
   </body>
 </html>

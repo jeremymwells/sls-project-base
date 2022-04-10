@@ -1,0 +1,23 @@
+  domain: ${self:custom.fqdn}
+  certificate: ${self:custom.certificateArn}
+  bucketName: ${self:provider.stackName}-web
+  omitBucketPrefix: true
+  distributionFolder: src/web/build
+  indexDocument: index.html
+  singlePageApp: true
+  invalidationPaths:
+    - /
+    - /${self:provider.stage}
+  compressWebContent: true
+  apiPath: ${self:custom.apiSegment}
+  originPath: "/${self:provider.stage}"
+  apiGatewayRestApiId: ${self:service}-api-${self:provider.stage}
+  clientCommand: "npm run build -- / ${self:custom.apiSegment} ${self:provider.stage}"
+  clientSrcPath: src/web
+  # waf: ${self:service}-waf-${self:provider.stage}
+  logging:
+    bucket: ${self:custom.webAccessLogName}.s3.amazonaws.com 
+    prefix: web-access
+  minimumProtocolVersion: TLSv1.2_2018
+  priceClass: PriceClass_100
+  noConfirm: true

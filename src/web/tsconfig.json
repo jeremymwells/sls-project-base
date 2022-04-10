@@ -1,5 +1,8 @@
 {
   "compilerOptions": {
+    "noImplicitAny": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
     "target": "es5",
     "lib": [
       "dom",
@@ -8,23 +11,18 @@
     ],
     "allowJs": true,
     "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "strict": false,
     "forceConsistentCasingInFileNames": true,
-    "noEmit": true,
-    "esModuleInterop": true,
+    "noFallthroughCasesInSwitch": false,
     "module": "esnext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "react-jsx",
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    "allowSyntheticDefaultImports": true,
-    "noFallthroughCasesInSwitch": true
+    "noEmit": true,
+    "jsx": "react-jsx"
   },
-  "exclude": [
-    "src/store/lib", "src/store/lib/.eslintrc"
-  ],
   "include": [
     "src"
   ]

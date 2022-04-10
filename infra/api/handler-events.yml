@@ -1,0 +1,12 @@
+appMessage:
+  name: ${self:provider.stackName}-app-message
+  handler: src/handlers/api/app.message
+  events:
+  - http:
+      path: api/app
+      private: false
+      method: get
+      request:
+        parameters:
+          querystrings:
+            message: true

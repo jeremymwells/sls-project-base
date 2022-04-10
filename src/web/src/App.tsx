@@ -1,31 +1,23 @@
-import { BrowserRouter as Router, Route, Switch, Redirect, useRouteMatch, useHistory, withRouter } from "react-router-dom"; 
+import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom"; 
 import { useEffect, useState } from 'react';
 
 import { config } from './config';
-import WelcomingPage from "./pages/WelcomPage";
+import WelcomingPage from "./pages/WelcomingPage";
 
 import './App.scss';
 
-function App(_props) {
-  const [ rendered, setRendered ] = useState(false);
+function App(_props: any) {
 
-  useEffect(() => {
-    if (!rendered) {
-      setTimeout(() => {
-        setRendered(true);
-        localStorage.setItem('s-login', '1');
-      }, 250);
-    }
-  });
+  useEffect(() => { });
 
   return (
-    <Router basename={config.baseHref}>
-      <Switch>
-        <Route exact path="/" render={ () => (<Redirect to="/welcome" />) } />
-        <Route path="/welcome" component={ WelcomingPage } />
-        <Route render={() => (<Redirect to="/" />)}/>
-      </Switch>
-    </Router>
+    <BrowserRouter basename={config.baseHref}>
+      <Routes>
+        <Route path="/" element={<Navigate to="/welcome" replace />} />
+        <Route path="/welcome" element={ < WelcomingPage /> } />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 

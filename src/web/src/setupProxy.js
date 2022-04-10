@@ -1,10 +1,10 @@
 const { createProxyMiddleware } = require('http-proxy-middleware');
 
-const stage = process.env.REACT_APP_STAGE || 'local';
+const apiPrefix = process.env.REACT_APP_API_ROOT || 'local';
 
 module.exports = function(app) {
   app.use(
-    `/${stage}/api/`,
+    `${apiPrefix}/`,
     createProxyMiddleware({
       target: `http://localhost:8080`,
       changeOrigin: true,

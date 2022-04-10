@@ -1,8 +1,6 @@
 
 service: projectbase
 
-# You can pin your service to only deploy with a specific Serverless version
-# Check out our docs for more details
 frameworkVersion: '3'
 
 provider:
@@ -10,62 +8,56 @@ provider:
   runtime: nodejs12.x
   stage: ${opt:stage, 'local'}
   region: ${opt:region, 'us-east-1'}
-  profile: projectbase-${self:provider.stage}
-  stackName: ${self:service}
+  profile: projectbase-${self:custom.env-key}
+  stackName: ${file(./serverless.config.js):stackName}
+  apiGateway: 
+    shouldStartNameWithService: true
+    description: ${self:provider.stackName} API 
+    binaryMediaTypes:
+      - '*/*'
+  deploymentBucket: 
+    name: ${self:provider.stackName}-sls-state
+    serverSideEncryption: AES256
   environment:
+    # API_ENDPOINT: { "Fn::Join" : ["", ["https://", { "Ref" : "ApiGatewayRestApi" }, ".execute-api.${self:custom.region}.amazonaws.com" ] ] }
     STAGE: '${self:provider.stage}'
     AWS_PROFILE: '${self:provider.profile}'
-  # iamRoleStatements:
-    # - ${file(./infra/web/s3-bucket.iam-role-statements.yml)}
-    # - Effect: Allow
-    #   Action:
-    #     - s3:PutObject
-    #   Resource: "arn:aws:s3:::web-${self:provider.stage}/*"
-  
+    API_SEGMENT: '${self:custom.apiSegment}'
 
 plugins:
   - serverless-offline
   - serverless-webpack
-  - fullstack-serverless
+  - '@animus-bi/fs-sls'
+  - serverless-deployment-bucket
 
 custom:
   region: ${self:provider.region}
+  env-key:  ${file(./serverless.config.js):env.key}
+  isEphemeral: ${file(./serverless.config.js):env.isEphemeral}
+  webAccessLogName: ${self:provider.stackName}-web-accesslogs
+  domainName: animus-bi.com
+  apiSegment: api
+  certificateArn: arn:aws:acm:us-east-1:223673446499:certificate/81d4e238-6bb9-4ac5-8409-3dcc6dd97ed7
+  fqdn: ${file(./serverless.config.js):fqdn}
+  deploymentBucket:
+    versioning: true
+    accelerate: true
+    blockPublicAccess: true
+    tags:
+      - Key: Environment
+        Value: ${self:provider.stage}
   webpack:
     includeModules: true
     forceExclude:
       - aws-sdk
-  fullstack:
-    ${file(./infra/web/fullstack.yml)}
+  fs-sls:
+    ${file(./infra/web/fs-sls.yml)}
 
 functions:
-  ${file(./infra/api/lambda.function-defs.yml)}
+  - ${file(./infra/api/handler-events.yml)}
 
-# resources: 
-#   Resources:
-#     WebsiteBucket:
-#       Type: AWS::S3::Bucket
-#       Properties:
-#         BucketName: 'web-${self:provider.stage}'
-#         WebsiteConfiguration:
-#           IndexDocument: index.html
-#           ErrorDocument: index.html
-#         BucketEncryption:
-#           ServerSideEncryptionConfiguration:
-#             - ServerSideEncryptionByDefault:
-#                 SSEAlgorithm: AES256
-#       DeletionPolicy: Delete
-#     BucketPolicy:
-#       Type: AWS::S3::BucketPolicy
-#       Properties:
-#         PolicyDocument:
-#           Version: "2012-10-17"
-#           Statement:
-#             - Effect: Allow
-#               Action: "s3:GetObject"
-#               Resource: !Sub arn:aws:s3:::${WebsiteBucket}/*
-#               Principal:
-#                 CanonicalUser: !GetAtt CloudFrontOriginAccessIdentity.S3CanonicalUserId
-#         Bucket: !Ref WebsiteBucket
-#   # - ${file(./infra/web/s3-bucket.resources.yml)}
+resources: 
+  - ${file(./infra/web/web-access-log-bucket.resources.yml)}
+  - ${file(./infra/web/web-cf-cname.resouces.yml)}
+  - ${file(./infra/api/apigw-cf-name.resources.yml)}
   
-
