@@ -1,0 +1,17 @@
+name: 'Deploy Setup'
+description: 'Sets up credentials and aws profile'
+inputs:
+  config:
+    required: yes
+  credentials:
+    required: yes
+runs:
+  using: "composite"
+  steps:
+    - id: credentials-setup
+      uses: ./.github/workflows/composite/credentials-setup
+      with:
+        config: ${{ inputs.config }}
+        credentials: ${{ inputs.credentials }}
+    - run: echo "deploy setup complete"
+      shell: bash

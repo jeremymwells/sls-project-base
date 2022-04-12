@@ -1,0 +1,20 @@
+name: 'Job Defaults'
+description: 'Specifies Node Runtime, Installs Deps, and Caches node_modules'
+inputs:
+  integrationBranch:
+    required: no
+    default: master
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/setup-node@v3
+      with:
+        node-version: '14.x'
+    - id: node-cache
+      uses: actions/cache@v2
+      with:
+        path: node_modules
+        key: node-modules-${{ hashFiles('package-lock.json') }}
+    - run: npm ci
+      if: steps.cache.outputs.cache-hit != 'true'
+      shell: bash

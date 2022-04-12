@@ -1,10 +1,10 @@
 {
   "name": "web",
-  "version": "0.1.0",
+  "version": "0.0.0",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^5.16.4",
-    "@testing-library/react": "^12.1.4",
+    "@testing-library/react": "^13.0.1",
     "@testing-library/user-event": "^13.5.0",
     "@types/jest": "^27.4.1",
     "@types/node": "^16.11.26",
@@ -23,16 +23,17 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "node ../../run.js web",
-    "build": "node ../../build.js",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
+    "lint": "./node_modules/.bin/eslint ./**/*.tsx  --resolve-plugins-relative-to='.'",
+    "lint:ci": "npm run lint",
+    "lint:fix": "npm run lint -- --fix",
+    "build": "node ../../runner.js build",
+    "e2e": "npm run test-integration",
+    "start": "node ../../runner.js run --target=web",
+    "start:ci": "cd ../ && npm start && cd -",
+    "test-unit": "node ../../runner.js run --target=unit --command='jest --config=./jest.config.ts --coverage --watch'",
+    "test-unit:ci": "CI=true node ../../runner.js run --target=unit --command='jest --config=./jest.config.ts --coverage'",
+    "test-integration": "concurrently \"cd ../ && npm start && cd -\" \"$(npm bin)/cypress open\"",
+    "test-integration:ci": "concurrently  -k -s first \"cd ../ && npm start && cd -\" \"$(npm bin)/cypress run --headless -b chrome\""
   },
   "browserslist": {
     "production": [
@@ -47,6 +48,19 @@
     ]
   },
   "devDependencies": {
-    "@types/react-dom": "^18.0.0"
+    "@types/react-dom": "^18.0.0",
+    "@typescript-eslint/eslint-plugin": "^5.20.0",
+    "@typescript-eslint/parser": "^5.20.0",
+    "axios-mock-adapter": "^1.20.0",
+    "concurrently": "^7.1.0",
+    "cypress": "^9.5.4",
+    "eslint": "^8.14.0",
+    "eslint-config-standard": "^17.0.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-n": "^15.1.0",
+    "eslint-plugin-promise": "^6.0.0",
+    "eslint-plugin-react": "^7.29.4",
+    "identity-obj-proxy": "^3.0.0",
+    "ts-jest": "^27.1.4"
   }
 }

@@ -1,0 +1,19 @@
+name: 'Credentials Setup'
+description: 'Sets up credentials and aws profile'
+inputs:
+  config:
+    required: yes
+  credentials:
+    required: yes
+runs:
+  using: "composite"
+  steps:
+    - id: make-aws-dir
+      run: mkdir -p ~/.aws
+      shell: bash
+    - id: write-aws-config
+      run: echo "${{ inputs.config }}" | base64 --decode > ~/.aws/config
+      shell: bash
+    - id: write-aws-credentials
+      run: echo "${{ inputs.credentials }}" | base64 --decode > ~/.aws/credentials
+      shell: bash

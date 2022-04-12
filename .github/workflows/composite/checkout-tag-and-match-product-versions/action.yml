@@ -1,0 +1,80 @@
+name: 'Checkout Tag & Verify Version Match'
+description: 'Checks out current tag; verifies package.json and src/web/package.json match tag'
+inputs:
+  validationResult:
+    required: yes
+  integrationBranch:
+    required: no
+    default: master
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout Tag & Verify Tag Is In History
+      id: checkout_tag_and_verify_history
+      shell: bash
+      run: |
+        ls -al
+
+        echo "checking out ${{ fromJson(inputs.validationResult).targetTag }}"
+
+        git checkout "${{ fromJson(inputs.validationResult).targetTag }}"
+        tag_sha=$(git rev-parse --short HEAD);
+        echo "git tag hash: $tag_sha";
+        git_log=$(git log);
+
+        # delete bunk revert tag
+        if [[ "${{ fromJson(inputs.validationResult).isReversion }}" == "true" ]]; then
+          git push origin :${{ fromJson(inputs.validationResult).sourceTag }} -o ci-skip
+        fi
+
+        ls -al
+
+        if [[ "$git_log" == *"$tag_sha"* ]]; then
+          echo "found sha in history: $tag_sha";
+        else
+          >&2 echo '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!';
+          >&2 echo "tag '${{ fromJson(inputs.validationResult).targetTag }}' not found in ${{ inputs.integrationBranch }} history";
+          >&2 echo '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!';
+          exit 1;
+        fi
+    - name: Verify Tag Matches Revision
+      id: verify_version
+      uses: actions/github-script@v5
+      with:
+        script: |
+          const semverToMatch = '${{ fromJson(inputs.validationResult).targetSemver }}';
+          const apiVersion = require('./package.json').version
+          const clientVersion = require('./src/web/package.json').version
+          console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+          console.log('Semver to match: ', semverToMatch);
+          console.log('API Version: ', apiVersion);
+          console.log('Client Version: ', clientVersion);
+          console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+
+          if (
+            (
+              apiVersion === semverToMatch &&
+              clientVersion === semverToMatch
+            ) ||
+            (
+              `v${apiVersion}` === semverToMatch &&
+              `v${clientVersion}` === semverToMatch
+            )
+          ) {
+            console.info('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+            console.info('Its a MATCH! Semver matches (./|src/web/)package.json versions!');
+            console.info('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+            return true;
+          }
+
+          console.error('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+          console.error('Semver does not match (./|src/web/)package.json versions (see above)');
+          console.error('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+          return process.exit(1);
+    - name: Write Version To Client
+      id: write_version_to_client
+      shell: bash
+      run: | 
+        if [[ "${{ fromJson(inputs.validationResult).isReversion }}" != "true" ]]; then
+          echo 'export const version = "${{ fromJson(inputs.validationResult).targetSemver }}";' > src/web/src/version.ts
+        fi

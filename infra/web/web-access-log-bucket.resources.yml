@@ -4,7 +4,7 @@ Resources:
     Condition: IsPathToProd
     DeletionPolicy: Retain
     Properties:
-      BucketName: ${self:custom.webAccessLogName}
+      BucketName: ${self:custom.web-access-log-bucket-name}
       VersioningConfiguration:
         Status: Enabled
   WebAccessLogBucketEphemeral:
@@ -12,15 +12,15 @@ Resources:
     Condition: IsEphemeral
     DeletionPolicy: Delete
     Properties:
-      BucketName: ${self:custom.webAccessLogName}
+      BucketName: ${self:custom.web-access-log-bucket-name}
       VersioningConfiguration:
         Status: Enabled
 Conditions:
   IsPathToProd:
     Fn::Equals:
-      - ${self:custom.isEphemeral}
+      - ${self:custom.is-ephemeral}
       - false  
   IsEphemeral:
     Fn::Equals:
-      - ${self:custom.isEphemeral}
+      - ${self:custom.is-ephemeral}
       - true  

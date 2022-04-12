@@ -1,0 +1,32 @@
+name: Revert Production
+
+env:
+  TARGET_INTEGRATION_BRANCH: master
+  TAG_REVERSION_TOKEN: '-revert-'
+
+on:
+  push:
+    tags:
+      - '*.*.*-revert-*'
+
+jobs:
+
+  revert-production:
+    name: Prod reverted
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref_type, 'tag')
+    environment:
+      name: prod
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+      - uses: ./.github/workflows/composite/deploy-path-to-prod
+        with:
+          command: npm run deploy:prod
+          config: ${{ secrets.AWS_CONFIG }}
+          credentials: ${{ secrets.AWS_CREDENTIALS }}
+          reversionToken: ${{ env.TAG_REVERSION_TOKEN }}
+          integrationBranch: ${{ github.env.TARGET_INTEGRATION_BRANCH }}
+          qualifyReversion: true

@@ -8,11 +8,19 @@
       "sourceMap": true,
       "target": "es2017",
       "outDir": ".tsout",
-      "experimentalDecorators": true
+      "experimentalDecorators": true,
+      "module": "commonjs",
+      "esModuleInterop": true
     },
-    "include": ["./**/*.ts" ],
+    "include": [
+      "./*.ts",
+      "./**/*.ts",
+      "./**/*.tsx",
+      "cypress/*"
+    ],
     "exclude": [
       "node_modules/**/*",
+      "src/web",
       ".serverless/**/*",
       ".webpack/**/*",
       "_warmup/**/*",

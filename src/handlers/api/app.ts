@@ -5,7 +5,7 @@ import { AppService } from '../../services';
 class AppHandler {
 
   @responseIfAnythingIsUnhandled(Response.GetDefault(500))
-  async message(event, _context, callback) {
+  async message (event, _context, callback) {
     const response = new AppService(event).getResponse();
     callback(null, response.send());
   }
@@ -13,5 +13,5 @@ class AppHandler {
 }
 
 export const {
-  message,
+  message
 } = new AppHandler();

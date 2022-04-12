@@ -1,0 +1,23 @@
+name: Dev Deployment
+
+on:
+  push:
+    branches: 'master'
+
+jobs:
+  quality-gate:
+    uses: ./.github/workflows/quality-gates.yml
+
+  deploy-to-dev:
+    name: Deploy to Dev
+    runs-on: ubuntu-latest
+    needs: [quality-gate]
+    environment:
+      name: dev
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/workflows/composite/deploy-dev-or-branch
+        with:
+          command: npm run deploy:dev
+          config: ${{ secrets.AWS_CONFIG }}
+          credentials: ${{ secrets.AWS_CREDENTIALS }}

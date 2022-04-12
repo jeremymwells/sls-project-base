@@ -12,4 +12,12 @@ jspm_packages
 
 .DS_Store
 
+.nyc_output
+
 src/web/build
+
+src/web/cypress/videos
+src/web/cypress/screenshots
+coverage
+*.tmp
+.env

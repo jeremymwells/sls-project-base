@@ -1,5 +1,7 @@
 node_modules
 .webpack
 .serverless
-src/static-files/web
+coverage
 src/web
+!.eslintrc.js
+cypress/types.d.ts

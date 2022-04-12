@@ -1,5 +1,5 @@
 
-service: projectbase
+service: ${file(package.json):name}
 
 frameworkVersion: '3'
 
@@ -16,29 +16,35 @@ provider:
     binaryMediaTypes:
       - '*/*'
   deploymentBucket: 
-    name: ${self:provider.stackName}-sls-state
+    name: ${self:custom.sls-bucket-name}
     serverSideEncryption: AES256
   environment:
-    # API_ENDPOINT: { "Fn::Join" : ["", ["https://", { "Ref" : "ApiGatewayRestApi" }, ".execute-api.${self:custom.region}.amazonaws.com" ] ] }
     STAGE: '${self:provider.stage}'
     AWS_PROFILE: '${self:provider.profile}'
-    API_SEGMENT: '${self:custom.apiSegment}'
+    API_SEGMENT: '${self:custom.api-segment}'
 
 plugins:
   - serverless-offline
   - serverless-webpack
   - '@animus-bi/fs-sls'
   - serverless-deployment-bucket
+  - serverless-s3-cleaner
 
 custom:
+  # variables for use elsewhere in serverless configuration
   region: ${self:provider.region}
   env-key:  ${file(./serverless.config.js):env.key}
-  isEphemeral: ${file(./serverless.config.js):env.isEphemeral}
-  webAccessLogName: ${self:provider.stackName}-web-accesslogs
-  domainName: animus-bi.com
-  apiSegment: api
-  certificateArn: arn:aws:acm:us-east-1:223673446499:certificate/81d4e238-6bb9-4ac5-8409-3dcc6dd97ed7
+  is-ephemeral: ${file(./serverless.config.js):env.isEphemeral}
+  domain-name: ${env:DOMAIN_NAME, file(package.json):domain-name, '{yourdomain.com}'}
+  api-segment: ${env:API_PREFIX, file(package.json):api-prefix, 'api'}
+  certificate-arn: arn:aws:acm:us-east-1:223673446499:certificate/81d4e238-6bb9-4ac5-8409-3dcc6dd97ed7
+  prod-CNAME: ${env:PROD_CNAME, file(package.json):prod-cname, 'www'}
   fqdn: ${file(./serverless.config.js):fqdn}
+  sls-bucket-name: ${self:provider.stackName}-sls-state
+  web-bucket-name: ${self:provider.stackName}-web
+  web-access-log-bucket-name: ${self:provider.stackName}-web-accesslogs
+
+  # plugins configurations
   deploymentBucket:
     versioning: true
     accelerate: true
@@ -46,6 +52,11 @@ custom:
     tags:
       - Key: Environment
         Value: ${self:provider.stage}
+  serverless-s3-cleaner:
+     buckets:
+       - ${self:custom.sls-bucket-name}
+       - ${self:custom.web-bucket-name}
+       - ${self:custom.web-access-log-bucket-name}
   webpack:
     includeModules: true
     forceExclude:
@@ -53,9 +64,11 @@ custom:
   fs-sls:
     ${file(./infra/web/fs-sls.yml)}
 
+# function definitions
 functions:
   - ${file(./infra/api/handler-events.yml)}
 
+# custom resources definitions
 resources: 
   - ${file(./infra/web/web-access-log-bucket.resources.yml)}
   - ${file(./infra/web/web-cf-cname.resouces.yml)}

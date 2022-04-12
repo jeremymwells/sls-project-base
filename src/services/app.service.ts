@@ -2,11 +2,11 @@ import { Response } from '../models';
 
 export class AppService {
 
-  constructor(
+  constructor (
     private event: any
   ) { }
 
-  getResponse() {
+  getResponse () {
     if (!this.event.queryStringParameters?.message) {
       return Response.GetDefault(406);
     }

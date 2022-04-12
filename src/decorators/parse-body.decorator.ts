@@ -1,14 +1,13 @@
-
-function parseEventHeader(headers, headerName) {
+function parseEventHeader (headers, headerName) {
   const normalizedHeaders = Array.isArray(headers || []) ? headers : Object.keys(headers);
   const caseInsensitiveHeaderMatch = (normalizedHeaders || []).filter(x => x.toLowerCase() === headerName.toLowerCase())[0] || '';
   return (headers || {})[caseInsensitiveHeaderMatch] || '';
 }
 
-function parseEventBody(eventBody) {
+function parseEventBody (eventBody) {
   let body;
   if (typeof eventBody === 'string') {
-    try { 
+    try {
       body = JSON.parse(eventBody);
     } catch (_) {
       body = JSON.parse(Buffer.from(eventBody, 'base64').toString('utf-8'));
@@ -20,16 +19,16 @@ function parseEventBody(eventBody) {
   return body;
 }
 
-export function parseBody(): any {
-  return function wrapper(
+export function parseBody (): any {
+  return function wrapper (
     _methodClass: any,
     _propertyKey: string,
-    descriptor: PropertyDescriptor,
+    descriptor: PropertyDescriptor
   ): any {
     const originalMethod: any = descriptor.value;
-    const value = function authorizeDescriptor(event: any, context, callback) {
+    const value = function authorizeDescriptor (event: any, context, callback) {
 
-      const [ contentTypeHeader ] = parseEventHeader(event.headers, 'content-type').split(' ');
+      const [contentTypeHeader] = parseEventHeader(event.headers, 'content-type').split(' ');
       console.log('EVENT BEFORE TRANSFORMING BODY', event, contentTypeHeader);
       console.log('CONTENT TYPE', contentTypeHeader);
 

@@ -1,0 +1,20 @@
+name: 'Deploy branch environment and dev environment'
+description: 'Orchestrates non-path-to-prod deployments'
+inputs:
+  command:
+    required: yes
+  config:
+    required: yes
+  credentials:
+    required: yes
+runs:
+  using: "composite"
+  steps:
+      - uses: ./.github/workflows/composite/job-defaults
+      - uses: ./.github/workflows/composite/deploy-setup
+        with:
+          config: ${{ inputs.config }}
+          credentials: ${{ inputs.credentials }}
+      - run: "${{ inputs.command }}"
+        shell: bash
+      - uses: ./.github/workflows/composite/deploy-teardown

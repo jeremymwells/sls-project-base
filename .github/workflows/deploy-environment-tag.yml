@@ -1,0 +1,46 @@
+name: Prod Deployment
+
+env:
+  TARGET_INTEGRATION_BRANCH: master
+  TAG_REVERSION_TOKEN: '-revert-'
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+      - '*.*.*'
+      - '!*.*.*-revert-*'
+
+jobs:
+  quality-gate:
+    uses: ./.github/workflows/quality-gates.yml
+
+  deploy-to-prod:
+    name: Deploy to Prod
+    runs-on: ubuntu-latest
+    needs: [quality-gate]
+    environment:
+      name: prod
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+      - uses: ./.github/workflows/composite/deploy-path-to-prod
+        with:
+          command: npm run deploy:prod
+          config: ${{ secrets.AWS_CONFIG }}
+          credentials: ${{ secrets.AWS_CREDENTIALS }}
+          reversionToken: ${{ env.TAG_REVERSION_TOKEN }}
+          integrationBranch: ${{ github.env.TARGET_INTEGRATION_BRANCH }}
+          qualifyReversion: false
+
+  # release-notes:
+  #   if: startsWith(github.ref_type, 'tag')
+  #   runs-on: ubuntu-latest
+  #   needs: deploy
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - uses: ./.github/workflows/composite/job-defaults
+  #     - run: echo "generate release notes here"
+

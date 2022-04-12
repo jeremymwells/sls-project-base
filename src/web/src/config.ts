@@ -1,8 +1,11 @@
 
+import { version } from './version';
+
 interface iConfig { 
   stage: string;
   baseHref: string;
   apiRoot: string;
+  version: string;
   basicAuthKey: string;
   isLocal?: boolean;
   dummyCreds?: { username: string, password: string }
@@ -13,7 +16,8 @@ const apiRoot = process.env.REACT_APP_API_ROOT || '';
 
 const configBase = {
   baseHref: `/`,
-  apiRoot
+  apiRoot,
+  version,
 } as iConfig;
 
 
@@ -25,4 +29,3 @@ const configHash: any = {
 };
 
 export const config = configHash[currentStage] || configHash.prod;
-console.log('CONFIG', config, process.env);

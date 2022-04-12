@@ -2,7 +2,7 @@ Resources:
   DnsCname:
     Type: AWS::Route53::RecordSet
     Properties:
-      HostedZoneName: ${self:custom.domainName}.
+      HostedZoneName: ${self:custom.domain-name}.
       Comment: { Fn::Join : [ "", [ "CNAME redirect ${self:custom.fqdn} to ", Fn::GetAtt: [ ApiDistribution, DomainName ], "." ] ] }
       Name: ${self:custom.fqdn}.
       Type: CNAME
