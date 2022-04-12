@@ -1,9 +1,7 @@
-import { WebResponse } from "../services/web.response";
-
+import { WebResponse } from '../services/web.response';
 
 class WebHandler {
 
-  
   async render(event, _context, callback) {
 
     const response = await new WebResponse(event).getAsync();

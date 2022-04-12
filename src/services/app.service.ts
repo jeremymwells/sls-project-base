@@ -3,7 +3,7 @@ import { Response } from '../models';
 export class AppService {
 
   constructor(
-    private event: any
+    private event: any,
   ) { }
 
   getResponse() {

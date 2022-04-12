@@ -1,17 +1,110 @@
 name: CI/CD Quality Gates
-on: [push]
+
+on:
+  workflow_call:
+
 jobs:
-  CICD-Quality-Gates:
+  lint:
+    name: Lint Check
     runs-on: ubuntu-latest
     steps:
-      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
-      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
-      - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
-      - name: Check out repository code
-        uses: actions/checkout@v3
-      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
-      - run: echo "🖥️ The workflow is now ready to test your code on the runner."
-      - name: List files in the repository
-        run: |
-          ls ${{ github.workspace }}
-      - run: echo "🍏 This job's status is ${{ job.status }}."
+      - uses: actions/checkout@v3
+      - uses: ./.github/workflows/composite/job-defaults
+      - run: npm run lint:ci
+
+  unit-test-client:
+    name: Client Unit Tests
+    runs-on: ubuntu-latest
+    needs: lint
+    env:
+      CLIENT_UNIT_ARTIFACTS_DIR: client-unit-artifacts
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/workflows/composite/job-defaults
+      - run:  |
+          cd src/web
+          npm run test-unit:ci
+          mkdir -p "$CLIENT_UNIT_ARTIFACTS_DIR"
+          mv coverage "$CLIENT_UNIT_ARTIFACTS_DIR"
+          cd -
+      - name: Upload client coverage to github
+        if: always()
+        uses: actions/upload-artifact@v2
+        with: 
+          name: "$CLIENT_UNIT_ARTIFACTS_DIR"
+          path: "$CLIENT_UNIT_ARTIFACTS_DIR"
+
+  unit-test-api:
+    name: API Unit Tests
+    runs-on: ubuntu-latest
+    needs: lint
+    env:
+      API_UNIT_ARTIFACTS_DIR: api-unit-artifacts
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/workflows/composite/job-defaults
+      - run:  |
+          npm run test-unit:ci
+          mkdir -p "$API_UNIT_ARTIFACTS_DIR"
+          mv coverage "$API_UNIT_ARTIFACTS_DIR"
+      - name: Upload api coverage to github
+        if: always()
+        uses: actions/upload-artifact@v2
+        with: 
+          name: "$API_UNIT_ARTIFACTS_DIR"
+          path: "$API_UNIT_ARTIFACTS_DIR"
+  
+  integration-test-client:
+    name: Client Integration Tests
+    runs-on: ubuntu-latest
+    needs: [unit-test-client, unit-test-api]
+    env:
+      CLIENT_INTEGRATION_ARTIFACTS_DIR: client-integration-artifacts
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/workflows/composite/job-defaults
+      - run:  |
+          cd src/web
+          npm run test-integration:ci
+          mkdir -p "$CLIENT_INTEGRATION_ARTIFACTS_DIR"
+          if [ -d "cypress/screenshots" ]; then
+            mv cypress/screenshots "$CLIENT_INTEGRATION_ARTIFACTS_DIR"
+          fi
+          if [ -d "cypress/videos" ]; then
+            mv cypress/videos "$CLIENT_INTEGRATION_ARTIFACTS_DIR"
+          fi
+          cd -
+        shell: bash
+      - name: Upload client integration artifacts to github
+        if: always()
+        uses: actions/upload-artifact@v2
+        with: 
+          name: "$CLIENT_INTEGRATION_ARTIFACTS_DIR"
+          path: "$CLIENT_INTEGRATION_ARTIFACTS_DIR"
+
+  integration-test-api:
+    name: API Integration Tests
+    runs-on: ubuntu-latest
+    needs: [unit-test-client, unit-test-api]
+    env:
+      API_INTEGRATION_ARTIFACTS_DIR: api-integration-artifacts
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/workflows/composite/job-defaults
+      - run:  |
+          npm run test-integration:ci
+          mkdir -p "$API_INTEGRATION_ARTIFACTS_DIR"
+          if [ -d "cypress/screenshots" ]; then
+            mv cypress/screenshots "$API_INTEGRATION_ARTIFACTS_DIR"
+          fi
+          if [ -d "cypress/videos" ]; then
+            mv cypress/videos "$API_INTEGRATION_ARTIFACTS_DIR"
+          fi
+        shell: bash
+      - name: Upload client integration artifacts to github
+        if: always()
+        uses: actions/upload-artifact@v2
+        with: 
+          name: "$API_INTEGRATION_ARTIFACTS_DIR"
+          path: "$API_INTEGRATION_ARTIFACTS_DIR"
+

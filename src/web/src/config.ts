@@ -25,4 +25,3 @@ const configHash: any = {
 };
 
 export const config = configHash[currentStage] || configHash.prod;
-console.log('CONFIG', config, process.env);

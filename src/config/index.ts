@@ -1,5 +1,3 @@
-
-
 export const config = {
-  up: true
+  up: true,
 };

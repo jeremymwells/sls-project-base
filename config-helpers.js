@@ -7,7 +7,13 @@ const safeCamelString = (str) => {
     return camelify(new urlSafeString().generate(str));
 }
 
-const getGitBranch = async () => {
+const getGitBranch = async (branchName) => {
+    if (branchName) {
+        branchName = branchName.replace('refs/heads/', '').replace('refs/tags/', '');
+        console.log('GIT BRANCH:', branchName);
+        return Promise.resolve(safeCamelString(branchName));
+    }
+
     return new Promise((resolve, reject) => {
         proxyProc.exec('git rev-parse --abbrev-ref HEAD', (err, stdout, stderr) => {
             if (err) {
@@ -69,7 +75,7 @@ const getEnvironmentBonafides = async (options, resolveVariable) => {
 }
 
 const getUsername = () => {
-    return safeCamelString(require('os').userInfo().username).toLowerCase();
+    return safeCamelString(process.env.GITHUB_ACTOR || require('os').userInfo().username).toLowerCase();
 }
 
 const getStackName = async (options, resolveVariable) => {
@@ -77,7 +83,7 @@ const getStackName = async (options, resolveVariable) => {
     let cliStage = await resolveVariable('self:provider.stage');
     const service = await resolveVariable('self:service');
     const username = getUsername();
-    const branchName = await getGitBranch();
+    const branchName = await getGitBranch(process.env.GITHUB_REF);
     let stackSuffix = branchName.toLowerCase();
     const segments = [service];
     if (environment.isEphemeral) {
@@ -92,8 +98,9 @@ const getStackName = async (options, resolveVariable) => {
 
 const getFQDN = async (options, resolveVariable) => {
     const environment = await getEnvironmentBonafides(options, resolveVariable);
-    const branchName = await getGitBranch();
+    const branchName = await getGitBranch(process.env.GITHUB_REF);
     const domainName = await resolveVariable('self:custom.domainName');
+    const prodCNAME = await resolveVariable('self:custom.prodCNAME')
 
     // ephemeral branch
     if (environment.isEphemeral) {
@@ -106,7 +113,7 @@ const getFQDN = async (options, resolveVariable) => {
     }
     
     // prod
-    return Promise.resolve(`wwe.${domainName}`.toLowerCase());
+    return Promise.resolve(`${prodCNAME}.${domainName}`.toLowerCase());
 }
 
 const getEnvironmentKey = async (options, resolveVariable) => {

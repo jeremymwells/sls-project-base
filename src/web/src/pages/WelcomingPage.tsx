@@ -2,19 +2,20 @@ import React, { useEffect, useState } from 'react';
 import { Fieldset } from 'primereact/fieldset';
 import { Button } from 'primereact/button';
 
-import axios from 'axios';
 import { config } from '../config';
+import axios from 'axios';
 
-export function WelcomingPage(_props: any) {
-  const [message, setMessage] = useState('')
+export function WelcomingPage(props: any) {
+  const [message, setMessage] = useState(props.message)
   
   useEffect(() => {
     if (!message) {
-      axios.get(`${config.apiRoot}/app?message=Welcome to a working full stack app ...`)
+      axios.get(`${config.apiRoot}/app?message=Welcome to a full stack app ...`)
         .then((response: any) => {
           setMessage(response.data);
         })
         .catch((error) => {
+          setMessage(`The server errored ${JSON.stringify(error)}`);
           console.error(error);
         });
     }
@@ -23,14 +24,14 @@ export function WelcomingPage(_props: any) {
   
   return (
     <>
-      <div className="welcoming-container">
+      <div data-testid="welcoming-container" className="welcoming-container">
         <header>
           <p>
             header
           </p>
         </header>
         <h1>
-          {message || 'Welcome to the client app...'}
+          {message}
         </h1>
         <div className="inner-container">
           <h2>

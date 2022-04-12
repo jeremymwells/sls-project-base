@@ -2,8 +2,8 @@ type HttpResponse = { statusCode: number, body: string, headers?: any };
 
 const handleError = (response, callback, error) => {
   console.error('UNHANDLED ERROR', error);
-  callback(null, response)
-}
+  callback(null, response);
+};
 
 export function responseIfAnythingIsUnhandled(response: HttpResponse): any {
   return function wrapper(
@@ -19,12 +19,12 @@ export function responseIfAnythingIsUnhandled(response: HttpResponse): any {
 
         const result = originalMethod.apply(this, [event, context, callback]);
         if (result && result.then) {
-          result.catch((error) => {
+          result.catch(error => {
             handleError(response, callback, error);
           });
         }
 
-      } catch(error) {
+      } catch (error) {
         handleError(response, callback, error);
       }
     };

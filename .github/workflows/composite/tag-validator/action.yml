@@ -1,0 +1,90 @@
+name: 'Tag Validator'
+description: 'Checks if tag is valid semver and returns { valid, sourceTag, targetTag, sourceSemver, targetSemver, isReversion }'
+inputs:
+  version:
+    required: yes
+  reversionToken:
+    required: yes
+  qualifyReversion:
+    required: no
+    default: no
+outputs:
+  result:
+    description: The tag validation result
+    value: ${{ steps.tagValidator.outputs.result }}
+runs:
+  using: "composite"
+  steps:
+    - name: Tag Validator
+      id: tagValidator
+      uses: actions/github-script@v5
+      with:
+        script: |
+          const expr = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/;
+          let sourceTag = targetTag = '${{ inputs.version }}';
+          let sourceSemver = targetSemver = sourceTag.indexOf('v') === 0 ? sourceTag.substring(1) : sourceTag;
+          const valid = expr.test(sourceSemver);
+          const isReversion = ~sourceSemver.indexOf('${{ inputs.reversionToken }}') ? true : false;
+          const qualifyToken = '${{ inputs.qualifyReversion }}'.toLowerCase();
+          const qualifyReversion = !~['no', 'false', false].indexOf(qualifyToken); // true if qualityToken value is not [false, 'false', 'no']
+
+          // job qualifies reversions, tag is a reversion, but it is not valid semver
+          if (qualifyReversion && isReversion && !valid) {
+            console.error('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+            console.error('Job qualifies reversions, tag is a reversion, but it is not valid semver');
+            console.error('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+            return process.exit(1);
+          }
+
+          // job qualifies reversions, but tag is not reversion
+          if (qualifyReversion && !isReversion) {
+            console.error('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+            console.error('Job qualifies reversions, but tag is not reversion');
+            console.error('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+            return process.exit(1);
+          }
+
+          // tag is reversion tag, but job doesn't qualify reversions
+          if (!qualifyReversion && isReversion) {
+            console.warn('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+            console.warn('You must set "qualifyReversion" to anything other than "no" in your step definition to revert production');
+            console.warn('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+            return process.exit(1);
+          }
+
+          // job qualifies reversions, tag is a reversion, and is valid
+          if (qualifyReversion && isReversion && valid) {
+            targetTag = sourceTag.replace(/${{ inputs.reversionToken }}/, '');
+            targetSemver = sourceSemver.replace(/${{ inputs.reversionToken }}/, '');
+            console.info('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+            console.info('Prod will be reverted to ' + targetSemver);
+            console.info('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+          }
+
+          // job does not qualify reversions, tag is not a reversion, and must be valid
+          if (!valid) {
+            console.error('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+            console.error('Version tag must be valid semver; an optional "v" prefix is the only allowed exception');
+            console.error('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+            return process.exit(1);
+          }
+
+          const result = {
+            isReversion,
+            valid,
+            sourceTag,
+            targetTag,
+            sourceSemver,
+            targetSemver,
+          };
+
+          // if we're here, prod should be able to go forward or backward according to version tag (? 😬 hopefully 😬 ?)
+          console.info('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+          console.info('');
+          console.log('Tag Validator Result: ')
+          console.info(result);
+          console.info('');
+          console.info('Proceed accordingly');
+          console.info('');
+          console.info('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+          return result;
