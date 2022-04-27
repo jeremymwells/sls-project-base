@@ -1,9 +1,12 @@
 {
   "name": "projectbase",
-  "version": "0.0.0",
+  "version": "999.999.997",
   "description": "base project to be forked for new fs apps",
-  "domain-name": "animus-bi.com",
-  "prod-cname": "www",
+  "domain": {
+    "name": "animus-bi.com",
+    "cert-arn": "arn:aws:acm:us-east-1:223673446499:certificate/81d4e238-6bb9-4ac5-8409-3dcc6dd97ed7"
+  },
+  "prod-cname": "wwe",
   "api-prefix": "api",
   "main": "index.js",
   "scripts": {
@@ -12,11 +15,14 @@
     "deploy:dev": "node runner.js deploy --stage=dev",
     "deploy:nonprod": "node runner.js deploy",
     "deploy:prod": "node runner.js deploy --stage=prod",
+    "domainName": "node runner.js domain",
     "lint:fix": "npm run lint -- --fix",
     "lint": "./node_modules/.bin/eslint './**/*.ts' --resolve-plugins-relative-to='.'",
     "lint:ci": "npm run lint",
     "local:api": "node runner.js run --target=api",
     "local:web": "cd src/web && npm start && cd -",
+    "migrations": "node runner.js migrate",
+    "migrations:list": "node runner.js migrate --cmd=list",
     "preinstall": "cd src/web && (npm install) && cd -",
     "preci": "cd src/web && (npm ci) && cd -",
     "prelint:ci": "cd src/web && npm run lint:ci && cd -",
@@ -25,8 +31,7 @@
     "test-unit:ci": "jest --config=./jest.config.ts --coverage",
     "test-integration": "concurrently \"npm run local:api\" \"node runner.js run --target=cypress -l\"",
     "test-integration:ci": "concurrently -k -s first \"npm run local:api\" \"node runner.js run --target=cypress\"",
-    "undeploy:nonprod": "node runner.js deploy --remove",
-    "domainName": "node runner.js domain"
+    "undeploy:nonprod": "node runner.js deploy --remove"
   },
   "author": "Jeremy Wells",
   "license": "ISC",
@@ -43,7 +48,7 @@
     "@types/serverless": "^1.72.5",
     "@typescript-eslint/eslint-plugin": "^5.20.0",
     "@typescript-eslint/parser": "^5.20.0",
-    "aws-sdk": "^2.1106.0",
+    "aws-sdk": "^2.1123.0",
     "camelify": "^0.1.0",
     "concurrently": "^5.3.0",
     "copy-webpack-plugin": "^6.0.3",
@@ -56,6 +61,7 @@
     "eslint-plugin-promise": "^6.0.0",
     "jest": "^27.5.1",
     "minimist": "^1.2.6",
+    "mograte": "^1.0.1",
     "pre-push": "^0.1.2",
     "serverless": "^3.10.2",
     "serverless-deployment-bucket": "^1.5.2",
@@ -70,5 +76,11 @@
     "url-safe-string": "^1.1.0",
     "webpack": "4.44.2",
     "webpack-node-externals": "^1.7.2"
+  },
+  "dependencies": {
+    "@typedorm/common": "^1.14.11",
+    "@typedorm/core": "^1.14.11",
+    "dynamoose": "^2.8.5",
+    "reflect-metadata": "^0.1.13"
   }
 }

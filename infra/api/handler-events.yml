@@ -1,6 +1,6 @@
 appMessage:
   name: ${self:provider.stackName}-app-message
-  handler: src/handlers/api/app.message
+  handler: src/api/handlers/api/app.message
   events:
   - http:
       path: api/app

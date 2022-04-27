@@ -1,12 +1,12 @@
-name: 'Credentials Setup'
-description: 'Sets up credentials and aws profile'
+name: Credentials Setup
+description: Sets up credentials and aws profile
 inputs:
   config:
     required: yes
   credentials:
     required: yes
 runs:
-  using: "composite"
+  using: composite
   steps:
     - id: make-aws-dir
       run: mkdir -p ~/.aws

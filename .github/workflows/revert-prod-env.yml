@@ -1,0 +1,54 @@
+name: Revert Prod Env
+
+env:
+  TARGET_INTEGRATION_BRANCH: master
+  TAG_REVERSION_TOKEN: '-revert-'
+
+on:
+  push:
+    tags:
+      - '*.*.*-revert-*'
+
+jobs:
+
+  prod-tag-gate:
+    name: Verify Prod Tag
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/workflows/composite/prod-tag-gate
+        id: tagValidator
+        with:
+          reversionToken:  ${{ env.TAG_REVERSION_TOKEN }}
+          integrationBranch: ${{ env.TARGET_INTEGRATION_BRANCH }}
+          qualifyReversion: true
+
+  revert-prod:
+    name: Revert Prod App & Infra
+    runs-on: ubuntu-latest
+    needs: [ prod-tag-gate ]
+    environment:
+      name: prod
+    steps:
+      - uses: actions/checkout@v3
+
+      # Have to include this because the validation result cannot be read from another job (SUCKS)
+      - uses: ./.github/workflows/composite/tag-validator
+        id: deployTagValidator
+        with:
+          version: ${{ github.ref_name }}
+          reversionToken:  ${{ env.TAG_REVERSION_TOKEN }}
+          qualifyReversion: true
+
+      - uses: ./.github/workflows/composite/aws-connected-command
+        with:
+          config: ${{ secrets.AWS_CONFIG }}
+          credentials: ${{ secrets.AWS_CREDENTIALS }}
+          command: |
+              git checkout ${{ fromJson(steps.deployTagValidator.outputs.result).targetTag }}
+              rm -rf node_modules && rm -rf src/web/node_modules
+              npm ci
+              npm run deploy:prod
+  
+  # TODO: figure migrations into this reversion? 
+  #   - In theory previous tables and data should still be there for a given historic release
