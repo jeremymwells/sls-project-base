@@ -6,6 +6,7 @@ const argv = minimist(process.argv.slice(2));
 const commandName = argv._[0];
 
 const commands = {
+    migrate: runnerHelpers.migrate,
     domain: runnerHelpers.domain,
     build: runnerHelpers.build,
     run: runnerHelpers.run,

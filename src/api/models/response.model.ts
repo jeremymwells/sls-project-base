@@ -8,7 +8,7 @@ export class Response {
 
   constructor (
     statusCode: number,
-    body: string
+    body: any
   ) {
     this.statusCode = statusCode;
 
@@ -23,9 +23,9 @@ export class Response {
     return Promise.resolve(this);
   }
 
-  send () {
+  send (callback: any) {
     console.log('SENDING RESPONSE', this);
-    return this;
+    callback(null, this);
   }
 
   static GetDefault (statusCode: number) {

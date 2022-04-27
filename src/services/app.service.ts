@@ -1,4 +1,4 @@
-import { Response } from '../models';
+import { Response } from '../api/models';
 
 export class AppService {
 
@@ -6,7 +6,7 @@ export class AppService {
     private event: any
   ) { }
 
-  getResponse () {
+  getResponse (): Response {
     if (!this.event.queryStringParameters?.message) {
       return Response.GetDefault(406);
     }

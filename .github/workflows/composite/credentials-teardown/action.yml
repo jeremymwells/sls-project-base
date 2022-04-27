@@ -1,7 +1,7 @@
-name: 'Credentials Teardown'
-description: 'Deletes credentials from runner'
+name: Credentials Teardown
+description: Deletes credentials from runner
 runs:
-  using: "composite"
+  using: composite
   steps:
     - id: remove-aws-config-credentials
       run: rm -rf ~/.aws

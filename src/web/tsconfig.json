@@ -1,5 +1,8 @@
 {
   "compilerOptions": {
+    "rootDir": "./",
+    "experimentalDecorators": true,
+    "strictPropertyInitialization": false,
     "noImplicitAny": false,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
