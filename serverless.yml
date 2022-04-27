@@ -8,7 +8,7 @@ provider:
   runtime: nodejs12.x
   stage: ${opt:stage, 'local'}
   region: ${opt:region, 'us-east-1'}
-  profile: projectbase-${self:custom.env-key}
+  profile: ${self:service}-${self:custom.env-key}
   stackName: ${file(./serverless.config.js):stackName}
   apiGateway: 
     shouldStartNameWithService: true
@@ -35,9 +35,9 @@ custom:
   region: ${self:provider.region}
   env-key:  ${file(./serverless.config.js):env.key}
   is-ephemeral: ${file(./serverless.config.js):env.isEphemeral}
-  domain-name: ${env:DOMAIN_NAME, file(package.json):domain-name, '{yourdomain.com}'}
+  domain-name: ${env:DOMAIN_NAME, file(package.json):domain.name, '{yourdomain.com}'}
   api-segment: ${env:API_PREFIX, file(package.json):api-prefix, 'api'}
-  certificate-arn: arn:aws:acm:us-east-1:223673446499:certificate/81d4e238-6bb9-4ac5-8409-3dcc6dd97ed7
+  certificate-arn: ${env:DOMAIN_CERT_ARN, file(package.json):domain.cert-arn, ''}
   prod-CNAME: ${env:PROD_CNAME, file(package.json):prod-cname, 'www'}
   fqdn: ${file(./serverless.config.js):fqdn}
   sls-bucket-name: ${self:provider.stackName}-sls-state

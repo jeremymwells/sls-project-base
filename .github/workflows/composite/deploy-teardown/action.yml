@@ -1,7 +1,7 @@
-name: 'Deploy Teardown'
-description: 'Tears down/deletes sensitive deployment artifacts from runner'
+name: Deploy Teardown
+description: Tears down/deletes sensitive deployment artifacts from runner
 runs:
-  using: "composite"
+  using: composite
   steps:
     - id: remove-credentials
       uses: ./.github/workflows/composite/credentials-teardown

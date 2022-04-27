@@ -1,0 +1,22 @@
+name: Branch Environment Cleanup
+
+on: delete
+
+jobs:
+
+  undeploy-branch-env:
+    name: Undeploy Branch Env
+    runs-on: ubuntu-latest
+    environment:
+      name: nonprod
+    steps:
+      - uses: ./.github/workflows/composite/aws-connected-command
+        with:
+          command: npm run undeploy:nonprod
+          config: ${{ secrets.AWS_CONFIG }}
+          credentials: ${{ secrets.AWS_CREDENTIALS }}
+      - uses: ./.github/workflows/composite/aws-connected-command
+        with:
+          command: npm run --silent migrations -- --cmd=down
+          config: ${{ secrets.AWS_CONFIG }}
+          credentials: ${{ secrets.AWS_CREDENTIALS }}

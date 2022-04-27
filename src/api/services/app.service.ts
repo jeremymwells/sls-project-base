@@ -6,7 +6,7 @@ export class AppService {
     private event: any
   ) { }
 
-  getResponse () {
+  getResponse (): Response {
     if (!this.event.queryStringParameters?.message) {
       return Response.GetDefault(406);
     }

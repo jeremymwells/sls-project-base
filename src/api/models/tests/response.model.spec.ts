@@ -1,5 +1,5 @@
 
-import { Response } from '../../models';
+import { Response } from '..';
 import { ResponseMessage, ResponseStatus } from '../../enums';
 
 describe('ResponseModel', () => {
