@@ -1,0 +1,57 @@
+name: Revert Prod Env
+
+# This whole flow was presuming an auto-redeploy scenario, but the more I think about it,
+# the more I think simply reverting the repo and/or retagging is the way (ie. the only way out is through or roll forward).
+
+env:
+  TARGET_INTEGRATION_BRANCH: master
+  TAG_REVERSION_TOKEN: '-revert-'
+
+on:
+  push:
+    tags:
+      - '*.*.*-revert-*'
+
+jobs:
+
+  prod-tag-gate:
+    name: Verify Prod Tag
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/workflows/composite/prod-tag-gate
+        id: tagValidator
+        with:
+          reversionToken:  ${{ env.TAG_REVERSION_TOKEN }}
+          integrationBranch: ${{ env.TARGET_INTEGRATION_BRANCH }}
+          qualifyReversion: true
+
+  revert-prod:
+    name: Revert Prod App & Infra
+    runs-on: ubuntu-latest
+    needs: [ prod-tag-gate ]
+    environment:
+      name: prod
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+
+      # Have to include this because the validation result cannot be read from another job (SUCKS)
+      - uses: ./.github/workflows/composite/tag-validator
+        id: deployTagValidator
+        with:
+          version: ${{ github.ref_name }}
+          reversionToken:  ${{ env.TAG_REVERSION_TOKEN }}
+          qualifyReversion: true
+
+      - uses: ./.github/workflows/composite/aws-connected-command
+        with:
+          config: ${{ secrets.AWS_CONFIG }}
+          credentials: ${{ secrets.AWS_CREDENTIALS }}
+          command: |
+              git checkout ${{ fromJson(steps.deployTagValidator.outputs.result).targetTag }}
+              rm -rf node_modules && rm -rf src/web/node_modules
+              npm ci
+              npm run deploy:prod

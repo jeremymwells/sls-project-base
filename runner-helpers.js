@@ -19,6 +19,22 @@ const getCypressEnvVars = (o) => {
     `.trim();
 }
 
+const getResolveVariablesShim = (argv) => {
+    const stage = argv.stage || 'nonprod';
+    const package = require('./package.json');
+    const service = package.name;
+    const domain = package['domain-name'] || '{yourdomain.com}';
+
+    return (varName) => {
+        return Promise.resolve({
+            'self:provider.stage': stage,
+            'self:custom.prod-CNAME': 'www',
+            'self:custom.domain-name': domain,
+            'self:service': service
+        }[varName]);
+    }
+}
+
 const runActions = {
     web: async (argv) => {
         const gitBranch = await helpers.getGitBranch(process.env.GITHUB_REF);
@@ -121,7 +137,9 @@ module.exports.deploy  = async (argv) => {
 }
 
 module.exports.domain = async (argv) => {
-    require('dotenv').config();
+    if (require('fs').existsSync('.env')){
+        require('dotenv').config();
+    }
     const writeOutput = (output) => {
         console.log('\x1b[33m%s\x1b[0m', `!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!`);
         console.log('\x1b[33m%s\x1b[0m', `-`);
@@ -142,18 +160,27 @@ module.exports.domain = async (argv) => {
     console.log('');
     
     process.env.GITHUB_ACTOR = process.env.GITHUB_ACTOR || helpers.getUsername();
-    const domain = require('./package.json')['domain-name'] || '{yourdomain.com}';
+    const branchName = await helpers.getGitBranch(process.env.GITHUB_REF);
+    const stage = ~branchName.indexOf('master') ? 'dev' : 'nonprod';
 
-    return helpers.getFQDN(undefined, (varName) => {
-        return Promise.resolve({
-            'self:provider.stage': 'nonprod',
-            'self:custom.prod-CNAME': 'www',
-            'self:custom.domain-name': domain,
-            'self:service': require('./package.json').name
-        }[varName]);
-    }).then((stackName) => {
-        writeOutput(stackName);
+    return helpers.getFQDN(undefined, getResolveVariablesShim({ ...argv, stage })).then((fqdn) => {
+        writeOutput(fqdn);
     });
+}
+
+module.exports.migrate = async (argv) => {
+    const stackName = await helpers.getStackName(undefined, getResolveVariablesShim(argv));
+    const envKey = await helpers.getEnvironmentKey(undefined, getResolveVariablesShim(argv));
+
+    process.env.AWS_PROFILE = `${require('./package.json').name}-${envKey}`;
+    process.env.DDB_TABLE_PREFIX = stackName;
+    process.env.MIGRATIONS_TABLE = `${stackName}.migrations`;
+
+    const migrationsResultCode = await helpers.runProcess(`mograte ${argv.cmd}`, true);
+
+    if (migrationsResultCode) {
+        process.exit(migrationsResultCode);
+    }
 }
 
 /* 

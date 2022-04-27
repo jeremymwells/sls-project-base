@@ -1,5 +1,5 @@
 import { AppService } from '..';
-import { Response } from '../../models';
+import { Response } from '../../api/models';
 
 describe('AppService', () => {
 

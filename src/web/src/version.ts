@@ -1,1 +1,1 @@
-export const version = "it's just the local flavortown";
+export const version = "vLocal";

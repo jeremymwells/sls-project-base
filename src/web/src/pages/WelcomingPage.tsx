@@ -6,7 +6,8 @@ import { config } from '../config';
 import axios from 'axios';
 
 export function WelcomingPage(props: any) {
-  const [message, setMessage] = useState(props.message)
+  const [message, setMessage] = useState(props.message);
+  const [organization, setOrganization] = useState(props.organization);
   
   useEffect(() => {
     if (!message) {
@@ -19,6 +20,16 @@ export function WelcomingPage(props: any) {
           console.error(error);
         });
     }
+    if (!organization) {
+      axios.get(`${config.apiRoot}/organization?name=GreenEZ Mowing&type=landscaping`)
+        .then((response: any) => {
+          setOrganization(response.data);
+        })
+        .catch((error) => {
+          setOrganization(`The server errored ${JSON.stringify(error)}`);
+          console.error(error);
+        });
+    }
   })
 
   
@@ -27,7 +38,7 @@ export function WelcomingPage(props: any) {
       <div data-testid="welcoming-container" className="welcoming-container">
         <header>
           <p>
-            header
+          {config.version} header
           </p>
         </header>
         <h1>
