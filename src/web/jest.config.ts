@@ -16,7 +16,11 @@ const config: Config.InitialOptions = {
     "src/config.ts",
     "src/index.tsx",
     "src/reportWebVitals.ts",
-    "src/setupProxy.js"
+    "src/setupProxy.js",
+    "src/api/",
+    "src/db/",
+    "src/services/",
+    "src/shared/"
   ],
   coveragePathIgnorePatterns: [
     '<rootDir>/node_modules/',
@@ -24,7 +28,11 @@ const config: Config.InitialOptions = {
     "src/config.ts",
     "src/index.tsx",
     "src/reportWebVitals.ts",
-    "src/setupProxy.js"
+    "src/setupProxy.js",
+    "src/api/",
+    "src/db/",
+    "src/services/",
+    "src/shared/"
   ],
   coverageReporters: sharedJestConfig.coverageReporters,
   coverageThreshold: sharedJestConfig.coverageThreshold,

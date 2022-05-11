@@ -1,5 +1,5 @@
-name: 'Tag Validator'
-description: 'Checks if tag is valid semver and returns { valid, sourceTag, targetTag, sourceSemver, targetSemver, isReversion }'
+name: Tag Validator
+description: Checks if tag is valid semver and returns { valid, sourceTag, targetTag, sourceSemver, targetSemver, isReversion }
 inputs:
   version:
     required: yes
@@ -13,7 +13,7 @@ outputs:
     description: The tag validation result
     value: ${{ steps.tagValidator.outputs.result }}
 runs:
-  using: "composite"
+  using: composite
   steps:
     - name: Tag Validator
       id: tagValidator
@@ -28,7 +28,7 @@ runs:
           const valid = expr.test(sourceSemver);
           const isReversion = ~sourceSemver.indexOf('${{ inputs.reversionToken }}') ? true : false;
           const qualifyToken = '${{ inputs.qualifyReversion }}'.toLowerCase();
-          const qualifyReversion = !~['no', 'false', false].indexOf(qualifyToken); // true if qualityToken value is not [false, 'false', 'no']
+          const qualifyReversion = !~['no', 'false', false].indexOf(qualifyToken); // true if qualifyToken value is not [false, 'false', 'no']
 
           // job qualifies reversions, tag is a reversion, but it is not valid semver
           if (qualifyReversion && isReversion && !valid) {

@@ -1,0 +1,14 @@
+[
+    {
+        "type": "landscaping",
+        "name": "GreenEZ Mowing",
+        "searchName": "greenez mowing",
+        "addresses": [{
+            "address1": "123 Street Ave",
+            "address2": "",
+            "city": "Townville",
+            "state": "ST",
+            "zip": "00001"
+        }]
+    }
+]

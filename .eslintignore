@@ -5,3 +5,4 @@ coverage
 src/web
 !.eslintrc.js
 cypress/types.d.ts
+src/db/migrations/*.ts

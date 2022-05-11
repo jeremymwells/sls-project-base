@@ -28,19 +28,13 @@ const getGitBranch = async (branchName) => {
     });
 }
 
-const runProcess = async (command) => {
+const runProcess = async (command, suppressExit = false) => {
     return new Promise((resolve, _reject) => {
         const proc = exec(command, { async:true });
-        proc.stdout.on('data', function (data) {
-            console.log(data.toString());
-        });
-        
-        proc.stderr.on('data', function (data) {
-            console.error(data.toString());
-        });
-        
         proc.on('exit', function (code) {
-            console.log('child process exited with code ' + code.toString());
+            if (!suppressExit){
+                console.log('child process exited with code ' + code.toString());
+            }
             resolve(code);
         });
     });

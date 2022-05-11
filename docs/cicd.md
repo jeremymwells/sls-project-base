@@ -67,12 +67,18 @@
 ## Deploy an environment for a given (non `master`) branch
       .github/workflows/deploy-environment-branch.yml
   
-  1. All pushes trigger deployment to `{gh username}-{urlsafe branch name}.{domainname.com}` if all quality gates pass
+  1. All branch pushes trigger deployment to `{gh username}-{urlsafe branch name}.{domainname.com}` 
+     - contingent upon:
+        1. all quality gates must pass
+        2. data migrations must succeed
 
 ## Deploy to Dev
       .github/workflows/deploy-environment-dev.yml
 
-  1. All pushes to `master` trigger deployment to `dev.{domainname.com}` if all quality gates pass
+  1. All pushes to `master` trigger deployment to `dev.{domainname.com}`
+      - contingent upon:
+        1. all quality gates must pass
+        2. data migrations must succeed
 
 ## Deploy Prod
     .github/workflows/deploy-environment-prod.yml
@@ -81,6 +87,9 @@
       - is formatted correctly (must be valid semver `X.X.X` or `vX.X.X`)
       - is found in `master` branch history (by commit hash)
       - semver matches version in `package.json` and `src/web/package.json`
+      - contingent upon:
+        1. all quality gates must pass
+        2. data migrations must succeed
 
 
 ## Reversion Tags

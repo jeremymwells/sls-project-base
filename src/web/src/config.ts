@@ -15,6 +15,7 @@ const currentStage = process.env.REACT_APP_STAGE || '';
 const apiRoot = process.env.REACT_APP_API_ROOT || '';
 
 const configBase = {
+  stage: currentStage,
   baseHref: `/`,
   apiRoot,
   version,
@@ -22,10 +23,9 @@ const configBase = {
 
 
 const configHash: any = {
-  nonprod: { ...configBase },
-  dev: { ...configBase },
-  uat: { ...configBase },
-  prod: { ...configBase },
+  nonprod: { ...configBase, env: 'nonprod' },
+  dev: { ...configBase, env: 'dev' },
+  prod: { ...configBase, env: 'prod' },
 };
 
 export const config = configHash[currentStage] || configHash.prod;

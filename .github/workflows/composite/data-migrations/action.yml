@@ -1,0 +1,32 @@
+
+name: Data migrations
+description: Runs data migrations; reverts them if they fail
+inputs:
+  stage:
+    required: yes
+    default: nonprod
+  config:
+    required: yes
+  credentials:
+    required: yes
+runs:
+  using: composite
+  steps:
+      - uses: ./.github/workflows/composite/job-defaults
+      - uses: ./.github/workflows/composite/deploy-setup
+        with:
+          config: ${{ inputs.config }}
+          credentials: ${{ inputs.credentials }}
+
+      - id: migrationDelta
+        shell: bash
+        run: echo ::set-output name=migrationDelta::$(npm run --silent migrations -- --cmd=delta --stage=${{ inputs.stage }})
+
+      - run: npm run --silent migrations -- --cmd=up --stage=${{ inputs.stage }}
+        shell: bash
+
+      - if: ${{ failure() && steps.migrationDelta.outputs.migrationDelta != '0' }}
+        shell: bash
+        run: npm run --silent migrations -- --cmd='down ${{ steps.migrationDelta.outputs.migrationDelta }}' --stage=${{ inputs.stage }}
+
+      - uses: ./.github/workflows/composite/deploy-teardown

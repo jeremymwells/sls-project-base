@@ -1,5 +1,5 @@
-name: 'Checkout Tag & Verify Version Match'
-description: 'Checks out current tag; verifies package.json and src/web/package.json match tag'
+name: Checkout Tag & Verify Version Match
+description: Checks out current tag; verifies package.json and src/web/package.json match tag
 inputs:
   validationResult:
     required: yes
@@ -7,14 +7,12 @@ inputs:
     required: no
     default: master
 runs:
-  using: "composite"
+  using: composite
   steps:
     - name: Checkout Tag & Verify Tag Is In History
       id: checkout_tag_and_verify_history
       shell: bash
       run: |
-        ls -al
-
         echo "checking out ${{ fromJson(inputs.validationResult).targetTag }}"
 
         git checkout "${{ fromJson(inputs.validationResult).targetTag }}"
@@ -26,8 +24,6 @@ runs:
         if [[ "${{ fromJson(inputs.validationResult).isReversion }}" == "true" ]]; then
           git push origin :${{ fromJson(inputs.validationResult).sourceTag }} -o ci-skip
         fi
-
-        ls -al
 
         if [[ "$git_log" == *"$tag_sha"* ]]; then
           echo "found sha in history: $tag_sha";
@@ -71,10 +67,3 @@ runs:
           console.error('Semver does not match (./|src/web/)package.json versions (see above)');
           console.error('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
           return process.exit(1);
-    - name: Write Version To Client
-      id: write_version_to_client
-      shell: bash
-      run: | 
-        if [[ "${{ fromJson(inputs.validationResult).isReversion }}" != "true" ]]; then
-          echo 'export const version = "${{ fromJson(inputs.validationResult).targetSemver }}";' > src/web/src/version.ts
-        fi
