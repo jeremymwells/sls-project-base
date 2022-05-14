@@ -1,121 +1,114 @@
 const helpers = require('./config-helpers');
 
-const getWebEnvVars = (o) => {
-    return `
-        REACT_APP_API_ROOT=${o.apiPrefix} \
-        REACT_APP_STAGE=${o.appStage} \
-        REACT_APP_PUBLIC_URL=${o.publicUrl} \
-        PUBLIC_URL=${o.publicUrl} \
-        DISABLE_ESLINT_PLUGIN=true
-    `.trim();
+const getWebEnvVars = async () => {
+  const gitBranch = await helpers.getGitBranch(process.env.GITHUB_REF);
+  const apiPrefix = require('./package.json')['api-prefix'];
+  const publicUrl = `/${gitBranch}`;
+  const apiRoot= `${publicUrl}/${apiPrefix}`;
+  const appStage = 'nonprod';
+
+  return Promise.resolve([
+    `REACT_APP_API_PREFIX=${apiPrefix}`,
+    `REACT_APP_API_ROOT=${apiRoot}`,
+    `REACT_APP_STAGE=${appStage}`,
+    `REACT_APP_PUBLIC_URL=${publicUrl}`,
+    `PUBLIC_URL=${publicUrl}`,
+    `DISABLE_ESLINT_PLUGIN=true`
+  ].join(' '));
 }
 
-const getCypressEnvVars = (o) => {
-    return `
-        CYPRESS_API_PREFIX=${o.apiPrefix} \
-        CYPRESS_STAGE=${o.appStage} \
-        CYPRESS_PUBLIC_URL=${o.publicUrl} \
-        PUBLIC_URL=${o.publicUrl}
-    `.trim();
+const getCypressEnvVars = async () => {
+  const gitBranch = await helpers.getGitBranch(process.env.GITHUB_REF);
+  const publicUrl = `http://localhost:8080/${gitBranch}`;
+  const apiPrefix = `api`;
+  const appStage = 'nonprod';
+
+  return Promise.resolve([
+    `CYPRESS_API_PREFIX=${apiPrefix}`,
+    `CYPRESS_STAGE=${appStage}`,
+    `CYPRESS_PUBLIC_URL=${publicUrl}`,
+    `PUBLIC_URL=${publicUrl}`,
+  ].join(' '));
 }
 
 const getResolveVariablesShim = (argv) => {
-    const stage = argv.stage || 'nonprod';
-    const package = require('./package.json');
-    const service = package.name;
-    const domain = package['domain-name'] || '{yourdomain.com}';
+  const stage = argv.stage || 'nonprod';
+  const package = require('./package.json');
+  const service = package.name;
+  const cname = package['prod-cname'] || 'www';
+  const domain = (package.domain || { name: '{yourdomain.com}' }).name || '{yourdomain.com}';
 
-    return (varName) => {
-        return Promise.resolve({
-            'self:provider.stage': stage,
-            'self:custom.prod-CNAME': 'www',
-            'self:custom.domain-name': domain,
-            'self:service': service
-        }[varName]);
-    }
+  return (varName) => {
+    return Promise.resolve({
+      'self:provider.stage': stage,
+      'self:custom.prod-CNAME': cname,
+      'self:custom.domain-name': domain,
+      'self:service': service
+    }[varName]);
+  }
 }
 
 const runActions = {
-    web: async (argv) => {
-        const gitBranch = await helpers.getGitBranch(process.env.GITHUB_REF);
-        const publicUrl = `/${gitBranch}`;
-        const apiPrefix = `${publicUrl}/api`;
-        const appStage = 'nonprod';
 
-        const startResultCode = await helpers.runProcess(`
-            ${getWebEnvVars({ apiPrefix, appStage, publicUrl })} react-scripts start
-        `.trim());
-        
-        if (startResultCode) {
-            process.exit(startResultCode);
-        }
-    },
-    api: async (argv) => {
-        process.env.BROWSER = 'none';
-        process.env.FAST_REFRESH = 'false';
-        process.env.SLS_DEBUG='*';
-        const port = argv.port || '8080';
-        const gitBranch = await helpers.getGitBranch(process.env.GITHUB_REF);
-        const runOfflineCode = await helpers.runProcess(`sls offline start --printOutput --httpPort ${port} --stage ${gitBranch}`);
-        if (runOfflineCode) {
-            process.exit(runOfflineCode);
-        }
-    },
-    unit: async (argv) => {
-        const gitBranch = await helpers.getGitBranch(process.env.GITHUB_REF);
-
-        const publicUrl = argv.publicUrl || `/${gitBranch}`;
-        const apiPrefix = argv.apiPrefix || `${publicUrl}/api`;
-        const appStage = argv.stage || 'nonprod';
-        const command = argv.command;
-
-        const startResultCode = await helpers.runProcess(`
-            ${getWebEnvVars({ apiPrefix, appStage, publicUrl })} ${command}
-        `.trim());
-        
-        if (startResultCode) {
-            process.exit(startResultCode);
-        }
-    },
-    cypress: async (argv) => {
-        const runOrOpen = argv.l || argv.local ? 'open': 'run --headless';
-        const gitBranch = await helpers.getGitBranch(process.env.GITHUB_REF);
-        const publicUrl = `http://localhost:8080/${gitBranch}`;
-        const apiPrefix = `api`;
-        const appStage = 'nonprod';
-
-        const runCypressCode = await helpers.runProcess(`
-            ${getCypressEnvVars({ apiPrefix, appStage, publicUrl })} $(npm bin)/cypress ${runOrOpen}
-        `.trim());
-        if (runCypressCode) {
-            process.exit(runCypressCode);
-        }
-    },
-    _: async () => {
-        console.error(`You must specify a target for argv[2] (supported options: 'web', 'api')`)
-        return Promise.resolve(process.exit(1));
+  web: async () => {
+    const envVars = await getWebEnvVars();
+    const startResultCode = await helpers.runProcess(`${envVars} react-scripts start`);
+    
+    if (startResultCode) {
+      process.exit(startResultCode);
     }
+  },
+
+  api: async (argv) => {
+    if (require('fs').existsSync('.env')){
+      require('dotenv').config();
+    }
+    process.env.BROWSER = 'none';
+    process.env.FAST_REFRESH = 'false';
+    process.env.SLS_DEBUG='*';
+    const port = argv.port || '8080';
+    const gitBranch = await helpers.getGitBranch(process.env.GITHUB_REF);
+    const runOfflineCode = await helpers.runProcess(`sls offline start --printOutput --httpPort ${port} --stage ${gitBranch}`);
+    if (runOfflineCode) {
+      process.exit(runOfflineCode);
+    }
+  },
+
+  unit: async (argv) => {
+    const envVars = await getWebEnvVars();
+    const startResultCode = await helpers.runProcess(`${envVars} ${argv.command}`);
+    
+    if (startResultCode) {
+      process.exit(startResultCode);
+    }
+  },
+
+  cypress: async (argv) => {
+    const runOrOpen = (argv.l || argv.local) ? 'open': 'run --headless';
+    const envVars = await getCypressEnvVars();
+    const runCypressCode = await helpers.runProcess(`${envVars} $(npm bin)/cypress ${runOrOpen}`);
+    if (runCypressCode) {
+        process.exit(runCypressCode);
+    }
+  },
+
+  _: async () => {
+    console.error(`You must specify a target for argv[2] (supported options: 'web', 'api')`)
+    return Promise.resolve(process.exit(1));
+  }
 }
 
 /*
  * returns void
  * argv: { publicUrl: string, apiPrefix: string, stage: string }
 */
-module.exports.build = async (argv) => {
-    
-    const gitBranch = await helpers.getGitBranch(process.env.GITHUB_REF);
-
-    const publicUrl = argv.publicUrl || `/${gitBranch}`;
-    const apiPrefix = argv.apiPrefix || `${publicUrl}/api`;
-    const appStage = argv.stage || 'nonprod';
-
-    const buildResultCode = await helpers.runProcess(`
-        ${getWebEnvVars({ apiPrefix, appStage, publicUrl })} react-scripts build
-    `.trim());
-    
-    if (buildResultCode) {
-        process.exit(buildResultCode);
-    }
+module.exports.build = async () => {
+  const envVars = await getWebEnvVars();
+  const buildResultCode = await helpers.runProcess(`${envVars} react-scripts build`);
+  
+  if (buildResultCode) {
+    process.exit(buildResultCode);
+  }
 }
 
 /* 
@@ -169,18 +162,18 @@ module.exports.domain = async (argv) => {
 }
 
 module.exports.migrate = async (argv) => {
-    const stackName = await helpers.getStackName(undefined, getResolveVariablesShim(argv));
-    const envKey = await helpers.getEnvironmentKey(undefined, getResolveVariablesShim(argv));
+  const stackName = await helpers.getStackName(undefined, getResolveVariablesShim(argv));
+  const envKey = await helpers.getEnvironmentKey(undefined, getResolveVariablesShim(argv));
 
-    process.env.AWS_PROFILE = `${require('./package.json').name}-${envKey}`;
-    process.env.DDB_TABLE_PREFIX = stackName;
-    process.env.MIGRATIONS_TABLE = `${stackName}.migrations`;
+  process.env.AWS_PROFILE = `${require('./package.json').name}-${envKey}`;
+  process.env.DDB_TABLE_PREFIX = stackName;
+  process.env.MIGRATIONS_TABLE = `${stackName}.migrations`;
 
-    const migrationsResultCode = await helpers.runProcess(`mograte ${argv.cmd}`, true);
+  const migrationsResultCode = await helpers.runProcess(`mograte ${argv.cmd}`, true);
 
-    if (migrationsResultCode) {
-        process.exit(migrationsResultCode);
-    }
+  if (migrationsResultCode) {
+    process.exit(migrationsResultCode);
+  }
 }
 
 /* 
@@ -188,6 +181,6 @@ module.exports.migrate = async (argv) => {
  * argv: { target: string }
 */
 module.exports.run = async (argv) => { 
-    return (runActions[argv.target] || runActions._)(argv);
+  return (runActions[argv.target] || runActions._)(argv);
 }
 

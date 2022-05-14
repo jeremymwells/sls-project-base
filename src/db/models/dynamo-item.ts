@@ -1,8 +1,9 @@
 
-export abstract class DynamoItem<T> {
-  createDate: number;
+export abstract class DynamoItem {
+  createdDate: number;
   lastEditedDate: number;
-  fromItem(item: any): T {
-    return {...this, ...item} as T;
-  };
+  createdBy: string;
+  lastEditedBy: string;
+  abstract toItem(); // transforms any properties for saving
+  abstract fromItem(item: any); // transforms any dynamodb records for use in app
 }

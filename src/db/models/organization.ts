@@ -2,13 +2,24 @@
 import { Address } from './address';
 import { DynamoItem } from './dynamo-item';
 
-export class Organization extends DynamoItem<Organization> {
+// eslint-disable-next-line no-use-before-define
+export class Organization extends DynamoItem {
+  name: string;
+  searchName: string;
   type: string;
+  addresses: Address[];
 
-  get searchName (): string {
-    return this.name.toLowerCase();
+  toItem () { // transforms any properties for saving
+    this.searchName = this.name.toLowerCase();
+    return this;
   }
 
-  name: string;
-  addresses: Address[];
+  fromItem (item: any) { // transforms any dynamodb records for use in app
+    if (!item) { return; }
+    const org = new Organization();
+    Object.keys(item).forEach(key => {
+      org[key] = item[key];
+    });
+    return org;
+  }
 }

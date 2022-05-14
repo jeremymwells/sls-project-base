@@ -1,124 +1,71 @@
 
-const AWS = require('aws-sdk');
-const pluralize = require('pluralize')
+import AWS from 'aws-sdk';
+import pluralize from 'pluralize';
 
-interface DDBQueryParams {
-  KeyConditionExpression: string[],
-  FilterExpression: string,
-  ExpressionAttributeNames: any,
-  ExpressionAttributeValues: any,
-  IndexName?: string,
-  modifiers?: any,
-}
+import { DynamoItem } from '../models/dynamo-item';
 
-export abstract class RepoBase<T> {
+type keyedFrom<T> = keyof T|string;
 
-  abstract partitionKey: string;
+export abstract class RepoBase<T extends DynamoItem> {
+
+  abstract partitionKey: keyedFrom<T>;
+  abstract sortKey: keyedFrom<T>;
+
+  secondaryKey: keyedFrom<T>;
   overrideTableName = '';
 
   get tableName () {
     return [
       process.env.DDB_TABLE_PREFIX,
-      this.overrideTableName || pluralize(this.model.name.toLowerCase())
-    ].join('.');
+      this.overrideTableName || pluralize(this.modelConstructor.name.toLowerCase())
+    ].filter(x => x).join('.');
   }
 
   constructor (
-    private model : new () => T,
-    private dynamoDB = new AWS.DynamoDB()
+    private modelConstructor : new () => T,
+    private dynamoDB: AWS.DynamoDB = new AWS.DynamoDB(),
+    private dynamoDocClient: AWS.DynamoDB.DocumentClient = new AWS.DynamoDB.DocumentClient()
   ) { }
 
-  private parseParams (
-    expr: any[],
-    indexName = '',
-    keyConditionExpressions = [],
-    filterExpression = '(',
-    attributeNames = {},
-    attributeValues = {},
-    modifiers = {}
-  ): DDBQueryParams {
+  // private getUpdateClause (item) {
+  //   const params = {
+  //     TableName: this.tableName,
+  //     Key: { [this.partitionKey]: item[this.partitionKey], [this.sortKey]: item[this.sortKey] },
+  //     ExpressionAttributeNames: {},
+  //     ExpressionAttributeValues: {},
+  //     UpdateExpression: 'SET'
+  //   };
 
-    while (expr.length > 0) {
-      const term = expr.shift();
-      if (typeof term === 'object') {
+  //   // set last edited date to now
+  //   item.lastEditedDate = Date.now();
 
-        if (Array.isArray(term)) {
-          const result = this.parseParams(
-            term,
-            indexName,
-            keyConditionExpressions,
-            filterExpression,
-            attributeNames,
-            attributeValues,
-            modifiers
-          );
-          filterExpression = `${result.FilterExpression})`;
-          attributeNames = result.ExpressionAttributeNames;
-          attributeValues = result.ExpressionAttributeValues;
-          keyConditionExpressions = result.KeyConditionExpression;
-          indexName = result.IndexName;
-          modifiers = result.modifiers;
-        } else {
-          filterExpression += '(';
-          const joiner = term.$join || 'AND';
-          delete term.$join;
+  //   Object.keys(item).forEach(key => {
+  //     if (key !== this.partitionKey && key !== this.sortKey) {
+  //       const ean = `#${key}`;
+  //       const eav = `:${key}`;
+  //       params.ExpressionAttributeNames[ean] = key;
+  //       params.ExpressionAttributeValues[eav] = item[key];
+  //       params.UpdateExpression += ` ${ean} = ${eav},`
+  //     }
+  //   });
 
-          const filterExpressionParts = Object.keys(term).map(key => {
+  //   params.UpdateExpression = params.UpdateExpression.slice(0, -1);
+  //   console.log('UPDATE EXPRESSION', params);
+  //   return params;
+  // }
 
-            modifiers[key] = modifiers[key] || 1;
-            if (attributeValues[`:${key}${modifiers[key]}`] ) {
-              modifiers[key]++;
-            }
-
-            const valueKey = `${key}${modifiers[key]}`;
-
-            // capture partition key
-            if (key === this.key) {
-              keyConditionExpressions.push(`#${key} = :${valueKey}`);
-            }
-
-            attributeNames[`#${key}`] = key;
-            attributeValues[`:${valueKey}`] = term[key];
-            return `#${key} = :${valueKey}`;
-          });
-
-          filterExpression += filterExpressionParts.join(` ${joiner.trim().toUpperCase()} `);
-          filterExpression += ')';
-        }
-
-        // filterExpression += ')';
-      } else if (typeof term === 'string') {
-        filterExpression += ` ${term.trim().toUpperCase()} `;
-      }
-
-    }
-    // filterExpression += ')';
-
-    const params = {
-      KeyConditionExpression: keyConditionExpressions,
-      FilterExpression: filterExpression,
-      ExpressionAttributeNames: attributeNames,
-      ExpressionAttributeValues: attributeValues,
-      modifiers
-    } as any;
-
-    if (indexName) {
-      params.IndexName = indexName;
-    }
-    return params;
-  }
-
-  private getValueForCondition(condition, value) {
-    switch(condition.toLowerCase()) {
+  private getValueForCondition (condition, value) {
+    switch (condition.toLowerCase()) {
 
       case 'in': {
-        const joinableValues = value.map((v) => {
+        const joinableValues = value.map(v => {
           if (typeof v === 'number') {
             return v;
           }
           if (typeof v === 'string') {
             return `'${v}'`;
           }
+          return v;
         });
         return `[${joinableValues.join(', ')}]`;
       }
@@ -127,35 +74,35 @@ export abstract class RepoBase<T> {
         if (value.length !== 2 || (typeof value[0] !== 'number' || typeof value[1] !== 'number')) {
           throw new Error(`Cannot use the ${condition} operator with more than 2 values`);
         }
-        return value.join(' AND ')
+        return value.join(' AND ');
       }
 
       default: {
         if (typeof value === 'number') {
           return value;
         } else if (typeof value === 'string') {
-          return `'${value}'`
+          return `'${value}'`;
         } else {
           return value;
         }
       }
-        
+
     }
   }
 
-  private parseWhere (expression: any[], whereClause = '') {
+  private convertToWhereClause (expression: any[], whereClause = '') {
     while (expression.length > 0) {
       const term = expression.shift();
       if (typeof term === 'object') {
         if (Array.isArray(term)) {
-          whereClause += `${this.parseParams(term, whereClause)})`;
+          whereClause += `${this.convertToWhereClause(term, whereClause)})`;
         } else {
           whereClause += '(';
           const joiner = (term.$join || 'and').toUpperCase();
           delete term.$join;
 
-          const cond = (term.$cond || '=').toUpperCase();
-          delete term.$cond;
+          const cond = (term.$condition || '=').toUpperCase();
+          delete term.$condition;
 
           const filterExpressionParts = Object.keys(term).map(key => {
             const value = this.getValueForCondition(cond, term[key]);
@@ -173,34 +120,78 @@ export abstract class RepoBase<T> {
     return whereClause;
   }
 
-  async selectAll (expressions: any[], projection = ['*'], config = {}) {
-    const whereClause = this.parseWhere(expressions);
+  async selectAll (expressions: any[], projection: string[] = ['*'], secondaryIndexName = '', config = {}) {
+    console.log('SELECTING ALL BY EXPRESSION & PROJECTION: ', expressions, projection);
+
+    const whereClause = this.convertToWhereClause(expressions);
+    console.log('SELECTING WHERE CLAUSE: ', whereClause);
+
     const projections = projection[0] === '*' ? '*' : projection.map(p => `"${p}"`).join(', ');
+
+    const tableNameParts = [
+      `"${this.tableName}"`,
+      secondaryIndexName ? `"${secondaryIndexName}"` : secondaryIndexName
+    ].join('.');
+
     const Statement = [
-      `SELECT ${projections}`, 
-      `FROM "${this.tableName}"`,
+      `SELECT ${projections}`,
+      `FROM ${tableNameParts}`,
       `WHERE ${whereClause}`
     ].join(' ');
+
+    console.log('SELECTING OVERALL STATEMENT: ', Statement);
     const result = await this.dynamoDB.executeStatement({ Statement, ...config }).promise();
-    return result.Items.map(AWS.DynamoDB.Converter.unmarshall);
+
+    console.log('SELECTED RESULT: ', result);
+    return result.Items.map(item => AWS.DynamoDB.Converter.unmarshall(item));
   }
 
-  async queryBy (keyObject: any, expression: any[]): Promise<any> {
-    const KeyConditionExpression = this.parseParams(keyObject).KeyConditionExpression;
-    const params = {
-      ...this.parseParams(expression),
-      ...KeyConditionExpression,
-      TableName: this.tableName
-    };
-    // const query = {
-    //     TableName: process.env.TPO_MEDICAL_EXAMINATIONS_TABLE,
-    //     ExpressionAttributeValues: {
-    //       ":hashValue": 0,
-    //     },
-    //     KeyConditionExpression: `${tableIndex.examinations.SyncedExams.hash} = :hashValue`,
-    //     IndexName: tableIndex.examinations.SyncedExams.name,
-    //     Limit: limit,
-    //   };
-    return this.dynamoDB.query(params).promise();
+  async putItem (item: T): Promise<any> {
+    item = item.toItem();
+    if (!item.createdDate) {
+      item.createdDate = Date.now();
+    }
+    item.lastEditedDate = Date.now();
+
+    console.log('PUTTING ITEM: ', item);
+    return this.dynamoDocClient.put({
+      TableName: this.tableName,
+      Item: item
+    });
   }
+
+  async updateItem (item: Partial<T>, config = {}) {
+    item = item.toItem();
+
+    console.log('UPDATING ITEM: ', item);
+    const setters = Object.keys(item)
+      .filter(key => key !== this.partitionKey && key !== this.sortKey)
+      .map(key => {
+        let value;
+        if (typeof item[key] === 'number') {
+          value = `${item[key]}`;
+        }
+        if (typeof item[key] === 'object') {
+          value = `${JSON.stringify(item[key])}`;
+        }
+        if (typeof item[key] === 'string') {
+          value = `'${item[key]}'`;
+        }
+        return `SET "${key}"=${value}\n`;
+      });
+
+    const Statement = [
+      `UPDATE "${this.tableName}"`,
+      `${setters.join('')}`,
+      `WHERE "${this.partitionKey}"='${(item as any)[this.partitionKey]}' AND "${this.sortKey}"=${(item as any)[this.sortKey]}`
+    ].join('\n');
+
+    console.log('UPDATE STATEMENT: ', Statement);
+
+    const result = await this.dynamoDB.executeStatement({ Statement, ...config }).promise();
+
+    console.log('UPDATE RESULT: ', result);
+    return Promise.resolve(result);
+  }
+
 }

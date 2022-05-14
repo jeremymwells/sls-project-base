@@ -129,12 +129,22 @@
       - The prod code from the commit/tag recreates and deploys to production environment
 
 6. ### Data Migrations
-     - This project uses a library called [mograte](https://www.npmjs.com/package/mograte) for DynamoDB migrations
-       - There is an example in `src/db/migrations/1651600563981_customers.ts`
-         - You may notice this migration imports utility ts files and seed json. `mograte` is a nice little utility.
-     - running `npm run migrations` to interact with the `mograte` package will set up an environment variable for you: `DDB_TABLE_PREFIX`
-       - You should use this env var to prefix table names so that there aren't collisions, as seen in the example provided
-     - Github actions will capture the number of new migrations it will run, migrate those up, and if anything fails, it will migrate those back down. 
+  - This project uses a library called [mograte](https://www.npmjs.com/package/mograte) for DynamoDB migrations
+    - There is an example in the `src/db/migrations` directory
+      - You may notice this migration imports utility ts files and seed json. `mograte` is a nice little utility.
+  - running `npm run migrations` to interact with the `mograte` package will set up an environment variable for you: `DDB_TABLE_PREFIX` - !!!this is important!!! - it keeps the schema correct.
+    - You should use this env var to prefix table names so that there aren't collisions, as seen in the example provided
+  - Github actions will capture the number of new migrations it will run, migrate those up, and if anything fails, it will migrate those back down.
+
+  - Here are some examples of mograte commands in this repo using `npm run` script:
+    - `npm run migrations -- --cmd='create myAwesomeMigration'` // creates `xxxxxxxxxx_myAwesomeMigration` migration
+    - `npm run migrations -- --cmd=list`                        // lists migrations
+    - `npm run migrations -- --cmd=down`                        // migrates all the way down
+    - `npm run migrations -- --cmd=up`                          // migrates all the way up
+    - `npm run migrations -- --cmd=delta`                       // gets the number of migrations yet to be run
+    - `npm run migrations -- --cmd='up 1'`                      // migrates up one migration
+    - `npm run migrations -- --cmd='down 2'`                    // migrates down 2 migrations
+    - (basically, `npm run migrations -- --cmd=` is equal to `mograte` || `npx mograte`)
         
 7. ### TODOs
     - add multi-browser testing strategy to client integration tests

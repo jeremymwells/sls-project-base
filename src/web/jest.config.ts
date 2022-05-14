@@ -4,11 +4,6 @@ import { sharedJestConfig } from '../../shared-jest.config';
 // Sync object
 const config: Config.InitialOptions = {
   verbose: true,
-
-  testMatch: [
-    "**/*.test.ts",
-    "**/*.test.tsx"
-  ],
   testPathIgnorePatterns: [
     // "<rootDir>/**/*.scss",
     '<rootDir>/node_modules/',
@@ -43,7 +38,8 @@ const config: Config.InitialOptions = {
   setupFilesAfterEnv: ['./setupTest.ts'],
   testEnvironment: 'jsdom',
   transform: {
-    '^.+\\.tsx?$': 'ts-jest'
+    '^.+\\.tsx?$': 'ts-jest',
+    '^.+\\.ts?$': 'ts-jest'
   },
 };
 

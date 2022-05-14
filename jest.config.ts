@@ -22,18 +22,18 @@ const config: Config.InitialOptions = {
     '^.+\\.tsx?$': 'ts-jest'
   },
   collectCoverageFrom: [
-    "**/*.ts",
-    "!**/node_modules/**",
-    "!**/*rc.*",
-    "!**/*.config.*",
-    "!**/*.spec.ts",
-    "!**/db/migrations/**",
-    "!**/src/web/**",
-    "!**/src/shared/lib/**", //remove at some point?
-    "!**/src/api/decorators/**", //remove at some point
-    "!**/src/api/handlers/**", //remove at some point
-    "!**/src/db/**", //remove at some point
-    "!**/src/services/organization.service.ts", //remove at some point
+    '**/*.ts',
+    '!**/node_modules/**',
+    '!**/*rc.*',
+    '!**/*.config.*',
+    '!**/*.spec.ts',
+    '!**/db/migrations/**',
+    '!**/src/web/**',
+    '!**/src/shared/lib/**', // remove at some point?
+    '!**/src/api/decorators/**', // remove at some point
+    '!**/src/api/handlers/**', // remove at some point
+    '!**/src/db/**', // remove at some point
+    '!**/src/services/organization.service.ts' // remove at some point
   ],
   coverageReporters: sharedJestConfig.coverageReporters,
   coverageThreshold: sharedJestConfig.coverageThreshold
