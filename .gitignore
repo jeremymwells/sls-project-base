@@ -21,3 +21,8 @@ src/web/cypress/screenshots
 coverage
 *.tmp
 .env
+index.js
+
+tmp
+
+mograte

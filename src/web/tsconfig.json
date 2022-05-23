@@ -1,5 +1,8 @@
 {
   "compilerOptions": {
+    "rootDir": "./",
+    "experimentalDecorators": true,
+    "strictPropertyInitialization": false,
     "noImplicitAny": false,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
@@ -24,6 +27,9 @@
     "jsx": "react-jsx"
   },
   "include": [
-    "src"
-  ]
+    "src",
+    "__tests__/App.test.tsx",
+    "__tests__/WelcomingPage.test.tsx"
+  ],
+  "files": ["./helpers.d.ts"]
 }

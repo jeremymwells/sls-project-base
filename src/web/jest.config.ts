@@ -4,11 +4,6 @@ import { sharedJestConfig } from '../../shared-jest.config';
 // Sync object
 const config: Config.InitialOptions = {
   verbose: true,
-
-  testMatch: [
-    "**/*.test.ts",
-    "**/*.test.tsx"
-  ],
   testPathIgnorePatterns: [
     // "<rootDir>/**/*.scss",
     '<rootDir>/node_modules/',
@@ -16,7 +11,11 @@ const config: Config.InitialOptions = {
     "src/config.ts",
     "src/index.tsx",
     "src/reportWebVitals.ts",
-    "src/setupProxy.js"
+    "src/setupProxy.js",
+    "src/api/",
+    "src/db/",
+    "src/services/",
+    "src/shared/"
   ],
   coveragePathIgnorePatterns: [
     '<rootDir>/node_modules/',
@@ -24,7 +23,11 @@ const config: Config.InitialOptions = {
     "src/config.ts",
     "src/index.tsx",
     "src/reportWebVitals.ts",
-    "src/setupProxy.js"
+    "src/setupProxy.js",
+    "src/api/",
+    "src/db/",
+    "src/services/",
+    "src/shared/"
   ],
   coverageReporters: sharedJestConfig.coverageReporters,
   coverageThreshold: sharedJestConfig.coverageThreshold,
@@ -35,7 +38,8 @@ const config: Config.InitialOptions = {
   setupFilesAfterEnv: ['./setupTest.ts'],
   testEnvironment: 'jsdom',
   transform: {
-    '^.+\\.tsx?$': 'ts-jest'
+    '^.+\\.tsx?$': 'ts-jest',
+    '^.+\\.ts?$': 'ts-jest'
   },
 };
 

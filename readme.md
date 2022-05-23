@@ -4,17 +4,25 @@
 
 1. ### Update package.json
 
+    *** *values will automatically populate serverless IaC configurations* ***
+  
+
     - change `name` to your application
       - make note of this for use in your .aws/config and .aws/credentials profiles
-    - change `domain-name` to your domain name (eg. animus-bi.com)
+    - change `domain > name` to your domain name (eg. animus-bi.com)
+    - change `domain > cert-arn` to the arn for your domain certificate; cert should be a wildcard cert (eg. *.animus-bi.com)
 
-1. ### AWS Web Console
+    - **Optional property changes**:
+      - `api` - determines the path the web client access api gateway through
+      - `prod-cname` - determines the cname for production releases (ie. the `www` in www.yourdomain.com)
+
+2. ### AWS Web Console
 
     - Obtain a domain via Route53
     - Create a certificate for your domain (eg. *.my-domain.com)
         - make note of the the certificate ARN for use in `serverless.yml`
 
-1. ### Create aws profiles for local deployment
+3. ### Create aws profiles for local deployment
 
     - This base app will support 3 primary environments:
         1. `nonprod` // every non `master` branch
@@ -53,13 +61,8 @@
         aws_secret_access_key={secret access key here}
         ```
     - If you wish to change the convention by which profiles are read, change the value of `serverless.yml > provider > profile`
-    
-2. ### Update `serverless.yml` 
 
-    - Change `serverless.yml > custom > domain-name` to your Route53 domain name
-    - Change `serverless.yml > custom > certificate-arn` to your certificate ARN
-
-3. ### Configuring deployments in GH Actions
+4. ### Configuring deployments in GH Actions
 
     - Create an Environment in GH for each of the environments mentioned above (`nonprod`, `dev`, `prod`)
         - See [here](https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment) for more insight about creating gh environments
@@ -95,7 +98,7 @@
         - Rinse and repeat these steps to create environment and secrets for each environment you wish to support
           - the `config.tmp` and `credentials.tmp` files only serve to produce the base64 encoded output; when you're done, they may be deleted. You may also keep them, as git will ignore them. Up to you.
 
-4. ### Path to prod
+5. ### Path to prod
    1. **Branch environments**
       - pushing to any branch (not `master`) will create an environment for the branch if it passes all the [quality gates](./docs/cicd.md)
         - these short-lived environments get cleaned up when the branch is deleted (presumably after being merged to an integration branch like `master`)
@@ -114,7 +117,9 @@
           - [quality gates](./docs/cicd.md) do not pass
         
    4. **Reverting Prod**
+      - Warning - this is slightly anacronyistic 
       - Create a new tag from any previous tag with a `-revert-` suffix
+        - The commit that you tag does not actually matter at all; it's used to trigger reversion, then deleted
         - The original tag must be valid semver with and cannot contain the `-revert-` reversion token
           - The tag without the `-revert-` reversion token will get checked out
             - It must match the versions in `package.json` and `src/web/package.json`
@@ -122,8 +127,26 @@
         - The presumption is that they were run and passed with the original prod deployment and this is truly a reversion
           - This might could change 😬
       - The prod code from the commit/tag recreates and deploys to production environment
+
+6. ### Data Migrations
+  - This project uses a library called [mograte](https://www.npmjs.com/package/mograte) for DynamoDB migrations
+    - There is an example in the `src/db/migrations` directory
+      - You may notice this migration imports utility ts files and seed json. `mograte` is a nice little utility.
+  - running `npm run migrations` to interact with the `mograte` package will set up an environment variable for you: `DDB_TABLE_PREFIX` - !!!this is important!!! - it keeps the schema correct.
+    - You should use this env var to prefix table names so that there aren't collisions, as seen in the example provided
+  - Github actions will capture the number of new migrations it will run, migrate those up, and if anything fails, it will migrate those back down.
+
+  - Here are some examples of mograte commands in this repo using `npm run` script:
+    - `npm run migrations -- --cmd='create myAwesomeMigration'` // creates `xxxxxxxxxx_myAwesomeMigration` migration
+    - `npm run migrations -- --cmd=list`                        // lists migrations
+    - `npm run migrations -- --cmd=down`                        // migrates all the way down
+    - `npm run migrations -- --cmd=up`                          // migrates all the way up
+    - `npm run migrations -- --cmd=delta`                       // gets the number of migrations yet to be run
+    - `npm run migrations -- --cmd='up 1'`                      // migrates up one migration
+    - `npm run migrations -- --cmd='down 2'`                    // migrates down 2 migrations
+    - (basically, `npm run migrations -- --cmd=` is equal to `mograte` || `npx mograte`)
         
-5. ### TODOs
+7. ### TODOs
     - add multi-browser testing strategy to client integration tests
     - automate release notes generation with production releases
     - add separate suites of integration tests to client and api for long-lived path-to-prod environments

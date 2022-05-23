@@ -1,0 +1,74 @@
+name: Deploy Prod Env
+
+env:
+  TARGET_INTEGRATION_BRANCH: master
+  TAG_REVERSION_TOKEN: '-revert-'
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+      - '*.*.*'
+      - '!*.*.*-revert-*'
+
+jobs:
+
+  quality-gate:
+    uses: ./.github/workflows/quality-gates-workflow.yml
+
+  prod-tag-gate:
+    name: Verify Prod Tag
+    runs-on: ubuntu-latest
+    needs: [ quality-gate ]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/workflows/composite/prod-tag-gate
+        with:
+          reversionToken:  ${{ env.TAG_REVERSION_TOKEN }}
+          integrationBranch: ${{ github.env.TARGET_INTEGRATION_BRANCH }}
+          qualifyReversion: false
+
+  deploy-data-migrations:
+    name: Run Data Migrations
+    runs-on: ubuntu-latest
+    needs: [ prod-tag-gate ]
+    environment:
+      name: prod
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/workflows/composite/data-migrations
+        with:
+          stage: prod
+          config: ${{ secrets.AWS_CONFIG }}
+          credentials: ${{ secrets.AWS_CREDENTIALS }}
+
+  deploy-infrastructure-and-app:
+    name: Deploy Prod App & Infra
+    runs-on: ubuntu-latest
+    needs: [ deploy-data-migrations ]
+    environment:
+      name: prod
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+
+      # Have to include this because the validation result cannot be read from another job (SUCKS)
+      - uses: ./.github/workflows/composite/tag-validator
+        id: deployTagValidator
+        with:
+          version: ${{ github.ref_name }}
+          reversionToken:  ${{ env.TAG_REVERSION_TOKEN }}
+          qualifyReversion: false
+
+      - uses: ./.github/workflows/composite/aws-connected-command
+        with:
+          config: ${{ secrets.AWS_CONFIG }}
+          credentials: ${{ secrets.AWS_CREDENTIALS }}
+          command: |
+              echo 'export const version = "${{ fromJson(steps.deployTagValidator.outputs.result).targetSemver }}";' > src/web/src/version.ts
+              git checkout ${{ fromJson(steps.deployTagValidator.outputs.result).targetTag }}
+              rm -rf node_modules && rm -rf src/web/node_modules
+              npm ci
+              npm run deploy:prod
