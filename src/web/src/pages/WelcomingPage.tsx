@@ -25,8 +25,8 @@ export function WelcomingPage(props: any) {
     if (!organization) {
       axios.get(`/organization?orgId=1652913832318`)
         .then((response: any) => {
-          setOrganization(response.data[0]);
-          setHeader(response.data[0].name);
+          setOrganization(response.data);
+          setHeader(response.data.name);
         })
         .catch((error) => {
           setOrganization(`The server errored ${JSON.stringify(error)}`);

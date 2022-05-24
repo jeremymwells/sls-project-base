@@ -1,11 +1,12 @@
+const path = require('path');
 const helpers = require('./config-helpers');
 
-const getWebEnvVars = async () => {
+const getWebEnvVars = async (argv) => {
   const gitBranch = await helpers.getGitBranch(process.env.GITHUB_REF);
-  const apiPrefix = require('./package.json')['api-prefix'];
-  const publicUrl = `/${gitBranch}`;
-  const apiRoot= `${publicUrl}/${apiPrefix}`;
-  const appStage = 'nonprod';
+  const apiPrefix = (argv || { apiPrefix: require('./package.json')['api-prefix'] || 'api' }).apiPrefix;
+  const publicUrl = (argv || { publicUrl: `/${gitBranch}` }).publicUrl;
+  const apiRoot= path.join(publicUrl, apiPrefix);
+  const appStage = (argv || { stage :'nonprod' }).stage;
 
   return Promise.resolve([
     `REACT_APP_API_PREFIX=${apiPrefix}`,
@@ -102,8 +103,8 @@ const runActions = {
  * returns void
  * argv: { publicUrl: string, apiPrefix: string, stage: string }
 */
-module.exports.build = async () => {
-  const envVars = await getWebEnvVars();
+module.exports.build = async (argv) => {
+  const envVars = await getWebEnvVars(argv);
   const buildResultCode = await helpers.runProcess(`${envVars} react-scripts build`);
   
   if (buildResultCode) {
@@ -162,6 +163,9 @@ module.exports.domain = async (argv) => {
 }
 
 module.exports.migrate = async (argv) => {
+  if (require('fs').existsSync('.env')){
+    require('dotenv').config();
+  }
   const stackName = await helpers.getStackName(undefined, getResolveVariablesShim(argv));
   const envKey = await helpers.getEnvironmentKey(undefined, getResolveVariablesShim(argv));
 

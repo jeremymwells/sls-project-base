@@ -145,8 +145,15 @@
     - `npm run migrations -- --cmd='up 1'`                      // migrates up one migration
     - `npm run migrations -- --cmd='down 2'`                    // migrates down 2 migrations
     - (basically, `npm run migrations -- --cmd=` is equal to `mograte` || `npx mograte`)
-        
-7. ### TODOs
+
+7. ### To Run
+
+  - install dependencies (run `npm i`) and then run `npm start` from project root
+    - Open browser to `http://localhost:3000`
+      - There is a dynamic reverse proxy for api calls that is configured via `src/web/src/setupProxy.js`
+        - This configuration is mimicked into the infrastructure, so it should run seamlessly
+
+8. ### TODOs
     - add multi-browser testing strategy to client integration tests
     - automate release notes generation with production releases
     - add separate suites of integration tests to client and api for long-lived path-to-prod environments

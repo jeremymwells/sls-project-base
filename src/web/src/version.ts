@@ -1,1 +1,1 @@
-export const version = "vLocal";
+export const version = require('../package.json').version;

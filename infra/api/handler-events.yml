@@ -22,4 +22,4 @@ organization:
       request:
         parameters:
           querystrings:
-            name: true
+            orgId: true

@@ -6,7 +6,7 @@ import WelcomingPage from '../src/pages/WelcomingPage';
 const mockedAxios = getMockAxios();
 
 const fakeFSResponse = { data: 'oh yes i did' };
-const fakeOrganizationResponse = { data: [{
+const fakeOrganizationResponse = { data: {
   addresses: [{
     zip: '00001',
     state: 'ST',
@@ -18,7 +18,7 @@ const fakeOrganizationResponse = { data: [{
   searchName: 'greenez mowing',
   name: 'GreenEZ Mowing',
   type: 'landscaping'
-}] };
+} };
 
 describe('Welcoming page', () => {
   let elem, container, getByTestId, mockApi1, mockApi2;
@@ -70,7 +70,7 @@ describe('Welcoming page', () => {
       expect(footer).toBeDefined();
       expect(pageContainer).toBeDefined();
       expect(pageContainer).toHaveTextContent(fakeFSResponse.data);
-      expect(pageContainer).toHaveTextContent(fakeOrganizationResponse.data[0].id);
+      expect(pageContainer).toHaveTextContent(fakeOrganizationResponse.data.id);
       expect(mockApi1).toHaveBeenCalled();
       expect(mockApi2).toHaveBeenCalled();
     });
