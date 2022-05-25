@@ -2,7 +2,7 @@
   certificate: ${self:custom.certificate-arn}
   bucketName: ${self:custom.web-bucket-name}
   omitBucketPrefix: true
-  distributionFolder: src/web/build
+  distributionFolder: src/client/web-build
   indexDocument: index.html
   singlePageApp: true
   invalidationPaths:
@@ -13,7 +13,7 @@
   originPath: "/${self:provider.stage}"
   apiGatewayRestApiId: ${self:service}-api-${self:provider.stage}
   clientCommand: "npm run build -- --publicUrl=/ --apiPrefix=${self:custom.api-segment} --stage=${self:provider.stage}"
-  clientSrcPath: src/web
+  clientSrcPath: src/client
   # waf: ${self:service}-waf-${self:provider.stage}
   logging:
     bucket: ${self:custom.web-access-log-bucket-name}.s3.amazonaws.com 

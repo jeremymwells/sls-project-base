@@ -52,6 +52,6 @@ jobs:
           credentials: ${{ secrets.AWS_CREDENTIALS }}
           command: |
               git checkout ${{ fromJson(steps.deployTagValidator.outputs.result).targetTag }}
-              rm -rf node_modules && rm -rf src/web/node_modules
+              rm -rf node_modules && rm -rf src/client/node_modules
               npm ci
               npm run deploy:prod

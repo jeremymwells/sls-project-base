@@ -106,12 +106,12 @@
    2. **Deploying to Dev**
       - pushing any new commit to `master` will deploy changes to `dev.{your-domain.com|net|biz|whatever}` if all [quality gates](./docs/cicd.md) are passed
    3. **Deploying to Prod**
-       - make sure `package.json` version and `src/web/package.json` version are the same, and the version adheres to [npm semver rules](https://docs.npmjs.com/cli/v7/configuring-npm/package-json#version)
-        - from your master branch, create a tag that matches the `package.json` and `src/web/package.json` version (you may prefix with `v` - eg `v.1.1.1`)
+       - make sure `package.json` version and `src/client/package.json` version are the same, and the version adheres to [npm semver rules](https://docs.npmjs.com/cli/v7/configuring-npm/package-json#version)
+        - from your master branch, create a tag that matches the `package.json` and `src/client/package.json` version (you may prefix with `v` - eg `v.1.1.1`)
         - push tag to origin
         - (ideally, a PR is what determines commits on `master`)
         - #### Deployment ***will fail*** if:
-          - `package.json` version and `src/web/package.json` version do not match and they do not match tag semver
+          - `package.json` version and `src/client/package.json` version do not match and they do not match tag semver
           - the inbound tag must be valid semver (a `v` prefix is allowed and preferred)
           - the commit hash for the tag is not in `master` commit history
           - [quality gates](./docs/cicd.md) do not pass
@@ -122,7 +122,7 @@
         - The commit that you tag does not actually matter at all; it's used to trigger reversion, then deleted
         - The original tag must be valid semver with and cannot contain the `-revert-` reversion token
           - The tag without the `-revert-` reversion token will get checked out
-            - It must match the versions in `package.json` and `src/web/package.json`
+            - It must match the versions in `package.json` and `src/client/package.json`
       - Quality gates are omitted/not run
         - The presumption is that they were run and passed with the original prod deployment and this is truly a reversion
           - This might could change 😬
@@ -150,7 +150,7 @@
 
   - install dependencies (run `npm i`) and then run `npm start` from project root
     - Open browser to `http://localhost:3000`
-      - There is a dynamic reverse proxy for api calls that is configured via `src/web/src/setupProxy.js`
+      - There is a dynamic reverse proxy for api calls that is configured via `src/client/src/setupProxy.js`
         - This configuration is mimicked into the infrastructure, so it should run seamlessly
 
 8. ### TODOs

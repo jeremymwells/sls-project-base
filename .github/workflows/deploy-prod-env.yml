@@ -67,8 +67,8 @@ jobs:
           config: ${{ secrets.AWS_CONFIG }}
           credentials: ${{ secrets.AWS_CREDENTIALS }}
           command: |
-              echo 'export const version = "${{ fromJson(steps.deployTagValidator.outputs.result).targetSemver }}";' > src/web/src/version.ts
+              echo 'module.exports.version = "${{ fromJson(steps.deployTagValidator.outputs.result).targetSemver }}";' > src/client/version.js
               git checkout ${{ fromJson(steps.deployTagValidator.outputs.result).targetTag }}
-              rm -rf node_modules && rm -rf src/web/node_modules
+              rm -rf node_modules && rm -rf src/client/node_modules
               npm ci
               npm run deploy:prod

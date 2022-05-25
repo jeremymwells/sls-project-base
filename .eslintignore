@@ -2,7 +2,7 @@ node_modules
 .webpack
 .serverless
 coverage
-src/web
+src/client
 !.eslintrc.js
 cypress/types.d.ts
 src/db/migrations/*.ts

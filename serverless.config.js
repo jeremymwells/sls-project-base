@@ -12,6 +12,9 @@ module.exports = async ({ options, resolveVariable }) => {
         username,
         stackName,
         env,
-        fqdn
-    }
+        fqdn,
+        _: {
+          stackName: stackName.replace(/-/gmi, '_')
+        }
+    };
   }

@@ -10,12 +10,12 @@ const config: Config.InitialOptions = {
   ],
   testPathIgnorePatterns: [
     '<rootDir>/node_modules/',
-    '<rootDir>/src/web/',
+    '<rootDir>/src/client/',
     '<rootDir>/cypress/'
   ],
   coveragePathIgnorePatterns: [
     '<rootDir>/node_modules/',
-    '<rootDir>/src/web/',
+    '<rootDir>/src/client/',
     '<rootDir>/cypress/'
   ],
   transform: {
@@ -28,7 +28,7 @@ const config: Config.InitialOptions = {
     '!**/*.config.*',
     '!**/*.spec.ts',
     '!**/db/migrations/**',
-    '!**/src/web/**',
+    '!**/src/client/**',
     '!**/src/shared/lib/**', // remove at some point?
     '!**/src/api/decorators/**', // remove at some point
     '!**/src/api/handlers/**', // remove at some point

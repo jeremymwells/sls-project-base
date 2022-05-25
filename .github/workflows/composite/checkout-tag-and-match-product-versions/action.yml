@@ -1,5 +1,5 @@
 name: Checkout Tag & Verify Version Match
-description: Checks out current tag; verifies package.json and src/web/package.json match tag
+description: Checks out current tag; verifies package.json and src/client/package.json match tag
 inputs:
   validationResult:
     required: yes
@@ -40,7 +40,7 @@ runs:
         script: |
           const semverToMatch = '${{ fromJson(inputs.validationResult).targetSemver }}';
           const apiVersion = require('./package.json').version
-          const clientVersion = require('./src/web/package.json').version
+          const clientVersion = require('./src/client/package.json').version
           console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
           console.log('Semver to match: ', semverToMatch);
           console.log('API Version: ', apiVersion);
@@ -58,12 +58,12 @@ runs:
             )
           ) {
             console.info('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
-            console.info('Its a MATCH! Semver matches (./|src/web/)package.json versions!');
+            console.info('Its a MATCH! Semver matches (./|src/client/)package.json versions!');
             console.info('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
             return true;
           }
 
           console.error('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
-          console.error('Semver does not match (./|src/web/)package.json versions (see above)');
+          console.error('Semver does not match (./|src/client/)package.json versions (see above)');
           console.error('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
           return process.exit(1);

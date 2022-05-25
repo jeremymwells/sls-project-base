@@ -1,0 +1,25 @@
+appMessage:
+  name: ${self:provider.stackName}-app-message
+  handler: src/api/handlers/api/app.message
+  events:
+  - http:
+      path: api/app
+      private: false
+      method: get
+      request:
+        parameters:
+          querystrings:
+            message: true
+
+organization:
+  name: ${self:provider.stackName}-organization
+  handler: src/api/handlers/api/organization.get
+  events:
+  - http:
+      path: api/organization
+      private: false
+      method: get
+      request:
+        parameters:
+          querystrings:
+            orgId: true
