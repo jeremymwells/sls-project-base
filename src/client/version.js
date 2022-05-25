@@ -1,0 +1,1 @@
+module.exports.version = `${require('./package.json').version} (${process.env.REACT_APP_STAGE})`;

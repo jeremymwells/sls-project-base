@@ -15,7 +15,6 @@
     "module": "commonjs",
     "esModuleInterop": true
   },
-  "types": ["reflect-metadata"],
   "include": [
     "./*.ts",
     "./**/*.ts",
@@ -24,7 +23,7 @@
   ],
   "exclude": [
     "node_modules/**/*",
-    "src/web",
+    "src/client",
     ".serverless/**/*",
     ".webpack/**/*",
     "_warmup/**/*",

@@ -14,8 +14,8 @@
 2. ### Client Unit Tests
     - Is run in parallel with `API Unit Tests` job
     - Requires `Lint Check` job to pass to run
-    - runs `src/web/package.json > scripts > test-unit:ci` 
-    - runs jest with config: `src/web/jest.config.ts` and coverage on
+    - runs `src/client/package.json > scripts > test-unit:ci` 
+    - runs jest with config: `src/client/jest.config.ts` and coverage on
       - coverage definitions come from a config file that is shared by client and api: `shared-jest.config` in project root
     - **IMPORTANT**: Mock all external calls to APIs and services for test isolation and idempotent results in pipelines
     - **Conditions to Pass**:
@@ -46,7 +46,7 @@
 
     - Is run in parallel with `API Integration Tests` job
     - Requires `API Unit Test` and `Client Unit Test` jobs to pass to run
-    - runs `src/web/package.json > scripts > test-integration:ci` 
+    - runs `src/client/package.json > scripts > test-integration:ci` 
     - runs cypress and a local web client
     - uses `runner.js` to set some dynamic environment variables needed in order to provide proper test context
     - **Conditions to Pass**:
@@ -86,7 +86,7 @@
   1. Deploys to `prod` if tag:
       - is formatted correctly (must be valid semver `X.X.X` or `vX.X.X`)
       - is found in `master` branch history (by commit hash)
-      - semver matches version in `package.json` and `src/web/package.json`
+      - semver matches version in `package.json` and `src/client/package.json`
       - contingent upon:
         1. all quality gates must pass
         2. data migrations must succeed
@@ -99,7 +99,7 @@
      - is a reversion tag (tag contains `-revert-`)
      - tag (commit hash without `-revert-` reversion token) is found in `master` branch history
      - **without** reversion token is compliant semver (must be semver `X.X.X-revert-` -> `X.X.X` or `vX.X.X-beta--revert-1` -> `vX.X.X-beta-1`)
-     - tag semver matches version in `package.json` and `src/web/package.json` in the historic tag/commit
+     - tag semver matches version in `package.json` and `src/client/package.json` in the historic tag/commit
 
 ## Branch Cleanup
     .github/workflows/cleanup.yml

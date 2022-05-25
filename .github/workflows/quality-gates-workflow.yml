@@ -20,7 +20,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: ./.github/workflows/composite/job-defaults
       - run:  |
-          cd src/web
+          cd src/client
           npm run test-unit:ci
           cd -
       - name: Upload client coverage to github
@@ -28,7 +28,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with: 
           name: client-unit-test-artifacts
-          path: src/web/coverage
+          path: src/client/coverage
 
   unit-test-api:
     name: API Unit Tests
@@ -53,7 +53,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: ./.github/workflows/composite/job-defaults
       - run:  |
-          cd src/web
+          cd src/client
           npm run test-integration:ci
           cd -
         shell: bash
@@ -63,8 +63,8 @@ jobs:
         with: 
           name: client-integration-test-artifacts
           path: |
-            src/web/cypress/screenshots
-            src/web/cypress/videos
+            src/client/cypress/screenshots
+            src/client/cypress/videos
 
   integration-test-api:
     name: API Integration Tests

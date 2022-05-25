@@ -1,0 +1,23 @@
+# Gives iam user permissions to * Cognito resources
+- Effect: Allow
+  Action:
+    - cognito-idp:AdminInitiateAuth
+    - cognito-idp:AdminCreateUser
+    - cognito-idp:AdminSetUserPassword
+  Resource: "*"
+
+# Gives iam user permissions to arn:aws:dynamodb:{region}:*:table/{servicename}.* tablespace(s)
+- Effect: Allow
+  Action:
+    - dynamodb:DescribeTable
+    - dynamodb:Query
+    - dynamodb:PutItem
+    - dynamodb:GetItem
+    - dynamodb:DeleteItem
+    - dynamodb:UpdateItem
+    - dynamodb:Scan
+    - dynamodb:PartiQLSelect
+    - dynamodb:PartiQLInsert
+    - dynamodb:PartiQLUpdate
+    - dynamodb:PartiQLDelete
+  Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/${self:service}-${self:custom.env-key}.*"

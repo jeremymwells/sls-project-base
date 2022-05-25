@@ -6,11 +6,18 @@ runs:
     - uses: actions/setup-node@v3
       with:
         node-version: '16.x'
-    - id: node-cache
-      uses: actions/cache@v2
-      with:
-        path: node_modules
-        key: node-modules-${{ hashFiles('package-lock.json') }}
+
+    # - id: node-cache-api
+    #   uses: actions/cache@v2
+    #   with:
+    #     path: node_modules
+    #     key: node-modules-${{ hashFiles('package-lock.json') }}
+    # - id: node-cache-client
+    #   uses: actions/cache@v2
+    #   with:
+    #     path: src/client/node_modules
+    #     key: node-modules-${{ hashFiles('package-lock.json') }}
+
     - run: npm ci
-      if: steps.cache.outputs.cache-hit != 'true'
+      # if: steps.node-cache-api.outputs.cache-hit != 'true' && steps.node-cache-client.outputs.cache-hit != 'true'
       shell: bash

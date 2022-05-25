@@ -1,8 +1,8 @@
 const path = require('path');
 const slsw = require('serverless-webpack');
 const nodeExternals = require('webpack-node-externals');
-const CopyPlugin = require('copy-webpack-plugin');
-const staticFilesDir = process.env.STATIC_FILES_PATH || 'static-files';
+// const CopyPlugin = require('copy-webpack-plugin');
+// const staticFilesDir = process.env.STATIC_FILES_PATH || 'static-files';
 
 module.exports = {
   context: __dirname,
