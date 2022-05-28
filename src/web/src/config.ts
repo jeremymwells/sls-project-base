@@ -1,6 +1,7 @@
 
 import axios from 'axios';
-import { version } from './version';
+import { CognitoConfig } from './configs/cognito';
+import { version } from './configs/version';
 
 interface iConfig { 
   stage: string;
@@ -8,19 +9,25 @@ interface iConfig {
   apiRoot: string;
   version: string;
   isLocal?: boolean;
-  dummyCreds?: { username: string, password: string }
+  cognito: CognitoConfig;
 }
+
+const cognito = {
+  userPoolName: process.env.REACT_APP_COGNITO_USERPOOL_NAME,
+  userPoolClientName: process.env.REACT_APP_COGNITO_USERPOOL_CLIENT_NAME,
+  region: process.env.REACT_APP_AWS_REGION,
+};
 
 const currentStage = process.env.REACT_APP_STAGE || '';
 const apiRoot = process.env.REACT_APP_API_ROOT || '';
-// const isJest = process.env.JEST_WORKER_ID || '';
 axios.defaults.baseURL = `${apiRoot}/`;
 
 const configBase = {
   stage: currentStage,
   baseHref: `/`,
   apiRoot,
-  version
+  version,
+  cognito,
 } as iConfig;
 
 

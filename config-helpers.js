@@ -113,14 +113,12 @@ const getEnvironmentKey = async (options, resolveVariable) => {
   return environment.key;
 }
 
-
-
 module.exports = {
-    getUsername,
-    getEnvironmentKey,
-    getFQDN,
-    getGitBranch,
-    getEnvironmentBonafides,
-    runProcess,
-    getStackName,
+  getUsername,
+  getEnvironmentKey,
+  getFQDN,
+  getGitBranch,
+  getEnvironmentBonafides,
+  runProcess,
+  getStackName,
 }

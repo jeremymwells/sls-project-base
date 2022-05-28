@@ -1,0 +1,22 @@
+Resources:
+  UserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: ${self:custom.userPoolName}
+      Schema:
+        - Name: email
+          Required: true
+          Mutable: false
+        - Name: firstname
+          Required: true
+          Mutable: false
+        - Name: lastname
+          Required: true
+          Mutable: false
+        - Name: organization
+          Required: true
+          Mutable: true
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 6
+      AutoVerifiedAttributes: ["email", "firstname", "lastname", "organization"]

@@ -7,12 +7,16 @@ const getWebEnvVars = async (argv) => {
   const publicUrl = (argv || { publicUrl: `/${gitBranch}` }).publicUrl;
   const apiRoot= path.join(publicUrl, apiPrefix);
   const appStage = (argv || { stage :'nonprod' }).stage;
+  const stackName = await helpers.getStackName(undefined, getResolveVariablesShim(argv));
 
   return Promise.resolve([
     `REACT_APP_API_PREFIX=${apiPrefix}`,
     `REACT_APP_API_ROOT=${apiRoot}`,
     `REACT_APP_STAGE=${appStage}`,
     `REACT_APP_PUBLIC_URL=${publicUrl}`,
+    `REACT_APP_AWS_REGION=${argv.region || 'us-east-1'}`,
+    `REACT_APP_COGNITO_USERPOOL_NAME=${stackName}-users`,
+    `REACT_APP_COGNITO_USERPOOL_CLIENT_NAME=${stackName}-client`,
     `PUBLIC_URL=${publicUrl}`,
     `DISABLE_ESLINT_PLUGIN=true`
   ].join(' '));

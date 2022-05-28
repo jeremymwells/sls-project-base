@@ -23,6 +23,10 @@ provider:
     AWS_PROFILE: '${self:provider.profile}'
     API_SEGMENT: '${self:custom.api-segment}'
     DDB_TABLE_PREFIX: '${self:provider.stackName}'
+    USER_POOL_ID: { Ref: UserPool }
+    CLIENT_ID: { Ref: UserClient }
+  iamRoleStatements:
+    ${file(./infra/iam/role-statements.yml)}
 
 plugins:
   - serverless-offline
@@ -44,6 +48,8 @@ custom:
   sls-bucket-name: ${self:provider.stackName}-sls-state
   web-bucket-name: ${self:provider.stackName}-web
   web-access-log-bucket-name: ${self:provider.stackName}-web-accesslogs
+  userPoolName: ${file(./serverless.config.js):stackName}-users
+  userPoolClientName: ${file(./serverless.config.js):stackName}-client
 
   # plugins configurations
   deploymentBucket:
@@ -67,11 +73,14 @@ custom:
 
 # function definitions
 functions:
-  - ${file(./infra/api/handler-events.yml)}
+  - ${file(./infra/api/auth-handler-events.yml)}
+  - ${file(./infra/api/domain-handler-events.yml)}
 
 # custom resources definitions
 resources: 
   - ${file(./infra/web/web-access-log-bucket.resources.yml)}
   - ${file(./infra/web/web-cf-cname.resouces.yml)}
   - ${file(./infra/api/apigw-cf-name.resources.yml)}
+  - ${file(./infra/cognito/user-pool.yml)}
+  - ${file(./infra/cognito/user-pool-client.yml)}
   
