@@ -12,13 +12,20 @@ const currentStage = process.env.REACT_APP_STAGE || '';
 const apiRoot = process.env.REACT_APP_API_ROOT || '';
 const baseUrl = process.env.REACT_APP_PUBLIC_URL || '';
 axios.defaults.baseURL = `${baseUrl}/${apiRoot}/`;
-console.log('hello', baseUrl);
+
+const cognitoConfig = {
+  cognito : {
+    userPoolName: process.env.REACT_APP_COGNITO_USERPOOL_NAME,
+    userPoolClientName: process.env.REACT_APP_COGNITO_USERPOOL_CLIENT_NAME,
+    region: process.env.REACT_APP_AWS_REGION,
+  }
+};
+
 const configBase = {
   stage: currentStage,
   baseHref: `/`,
   apiRoot,
 } as iConfig;
-
 
 const configHash: any = {
   nonprod: { ...configBase, env: 'nonprod' },
@@ -32,7 +39,8 @@ export default (appJson: { config: any }) => {
     ...appJson.config,
     extra: {
       ...(configHash[currentStage] || configHash.prod) as iConfig,
-      ...require('./version')
+      ...require('./version'),
+      ...cognitoConfig,
     }
   }
 }

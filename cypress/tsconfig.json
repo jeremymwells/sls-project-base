@@ -22,6 +22,9 @@
       "isolatedModules": false,
       "noEmit": true
     },
+    "exclude": [
+      "*/*.d.ts",
+    ],
     "include": [
         "*/*.ts",
         "../node_modules/cypress"

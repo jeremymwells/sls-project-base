@@ -2,6 +2,7 @@ const helpers = require('./config-helpers');
 
 const getWebEnvVars = async (argv) => {
   const local = (argv.l || argv.local) ? true : false;
+  const stackName = (await helpers.getStackName(undefined, getResolveVariablesShim(argv))).replace(/-/gmi, '_');
   const domain = await helpers.getFQDN(null, getResolveVariablesShim(argv));
   const gitBranch = await helpers.getGitBranch(process.env.GITHUB_REF);
   const appStage = (argv || { }).stage || 'nonprod';
@@ -24,6 +25,9 @@ const getWebEnvVars = async (argv) => {
     `REACT_APP_STAGE=${appStage}`,
     `REACT_APP_PUBLIC_URL=${publicUrl}`,
     `PUBLIC_URL=${publicUrl}`,
+    `REACT_APP_AWS_REGION=${argv.region || 'us-east-1'}`,
+    `REACT_APP_COGNITO_USERPOOL_NAME=${stackName}_users`,
+    `REACT_APP_COGNITO_USERPOOL_CLIENT_NAME=${stackName}_client`,
     `DISABLE_ESLINT_PLUGIN=true`
   ].join(' '));
 }

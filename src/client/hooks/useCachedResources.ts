@@ -1,7 +1,7 @@
 import { FontAwesome } from '@expo/vector-icons';
 import * as Font from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 
 export default function useCachedResources() {
   const [isLoadingComplete, setLoadingComplete] = useState(false);
@@ -17,10 +17,15 @@ export default function useCachedResources() {
           ...FontAwesome.font,
           'space-mono': require('../assets/fonts/SpaceMono-Regular.ttf'),
         });
+
+        await setTimeout(() => {
+          console.log('loaded')
+        }, 5000)
       } catch (e) {
         // We might want to provide this error information to an error reporting service
         console.warn(e);
       } finally {
+        console.log('LOADING COMPLETE!!!!!!!!!!!!!!!!!!!!!!')
         setLoadingComplete(true);
         SplashScreen.hideAsync();
       }

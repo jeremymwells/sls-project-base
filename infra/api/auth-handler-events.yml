@@ -1,5 +1,5 @@
-auth:
-  name: ${self:provider.stackName}-auth
+auth-register:
+  name: ${self:provider.stackName}-auth-register
   handler: src/api/handlers/api/auth/user.register
   environment:
     USER_POOL_NAME: ${self:custom.userPoolName}
@@ -7,5 +7,16 @@ auth:
   events:
   - http:
       path: api/auth/register
+      private: false
+      method: post
+auth-login:
+  name: ${self:provider.stackName}-auth-login
+  handler: src/api/handlers/api/auth/user.login
+  environment:
+    USER_POOL_NAME: ${self:custom.userPoolName}
+    USER_POOL_CLIENT_NAME: ${self:custom.userPoolClientName}
+  events:
+  - http:
+      path: api/auth/login
       private: false
       method: post

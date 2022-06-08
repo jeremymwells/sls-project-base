@@ -1,8 +1,11 @@
 Resources:
-  UserPoolClient:
-    Type: "AWS::Cognito::UserPoolClient"
+  UserClient:
+    Type: AWS::Cognito::UserPoolClient
     Properties:
       ClientName: ${self:custom.userPoolClientName}
-      GenerateSecret: False
-      UserPoolId:
-        Ref: UserPool
+      GenerateSecret: false
+      UserPoolId: ${self:custom.userPoolName}
+      AccessTokenValidity: 5
+      IdTokenValidity: 5
+      ExplicitAuthFlows:
+        - "ADMIN_NO_SRP_AUTH"

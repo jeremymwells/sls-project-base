@@ -1,15 +1,22 @@
 Resources:
   UserPool:
-    Type: "AWS::Cognito::UserPool"
+    Type: AWS::Cognito::UserPool
     Properties:
-      MfaConfiguration: OFF
       UserPoolName: ${self:custom.userPoolName}
-      UsernameAttributes:
-        - email
+      Schema:
+        - Name: email
+          Required: true
+          Mutable: false
+        - Name: firstname
+          Required: true
+          Mutable: false
+        - Name: lastname
+          Required: true
+          Mutable: false
+        - Name: organization
+          Required: true
+          Mutable: true
       Policies:
         PasswordPolicy:
           MinimumLength: 6
-          RequireLowercase: False
-          RequireNumbers: True
-          RequireSymbols: False
-          RequireUppercase: True
+      AutoVerifiedAttributes: ["email", "firstname", "lastname", "organization"]
